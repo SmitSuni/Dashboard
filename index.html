@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Dashboard personal de Smit Alexander Suni Morales - Estudiante de la Universidad Nacional del Altiplano con conocimientos en programación, estadística e ingeniería">
+    <meta name="author" content="Smit Alexander Suni Morales">
+    <meta name="keywords" content="programación, estadística, ingeniería, Python, C++, desarrollo de software, portfolio, developer, data science">
+
+    <!-- Theme Color -->
+    <meta name="theme-color" content="#0a0e14">
+    <meta name="color-scheme" content="dark light">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://SmitSuni.github.io/dashboard/">
+    <meta property="og:title" content="Smit Alexander Suni Morales | Dashboard">
+    <meta property="og:description" content="Estudiante con conocimientos en programación, estadística e ingeniería civil">
+    <meta property="og:image" content="https://avatars.githubusercontent.com/SmitSuni">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://SmitSuni.github.io/dashboard/">
+    <meta name="twitter:title" content="Smit Alexander Suni Morales | Dashboard">
+    <meta name="twitter:description" content="Estudiante con conocimientos en programación, estadística e ingeniería civil">
+    <meta name="twitter:image" content="https://avatars.githubusercontent.com/SmitSuni">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='0.9em' font-size='90'>💻</text></svg>">
+    <link rel="alternate icon" type="image/png" href="https://avatars.githubusercontent.com/SmitSuni">
+    <link rel="apple-touch-icon" href="https://avatars.githubusercontent.com/SmitSuni">
+
+    <!-- Preconnect for performance -->
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+    <link rel="preconnect" href="https://api.github.com">
+
+    <title>Smit Alexander Suni Morales | Dashboard Personal</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Particles Background -->
+    <canvas id="particlesCanvas"></canvas>
+
+    <!-- Fixed Navigation Bar -->
+    <nav class="navbar" id="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <i class="fas fa-code"></i>
+                <span>SA</span>
+            </div>
+            <ul class="nav-menu" id="nav-menu">
+                <li><a href="#home" class="nav-link">Inicio</a></li>
+                <li><a href="#stats" class="nav-link">Estadísticas</a></li>
+                <li><a href="#about" class="nav-link">Sobre Mí</a></li>
+                <li><a href="#timeline" class="nav-link">Logros</a></li>
+                <li><a href="#projects" class="nav-link">Proyectos</a></li>
+                <li><a href="#skills" class="nav-link">Habilidades</a></li>
+                <li><a href="#github" class="nav-link">GitHub</a></li>
+                <li><a href="#contact" class="nav-link">Contacto</a></li>
+            </ul>
+            <div class="nav-actions">
+                <button class="theme-toggle" id="theme-toggle" aria-label="Toggle theme">
+                    <i class="fas fa-sun"></i>
+                    <i class="fas fa-moon"></i>
+                </button>
+                <button class="nav-hamburger" id="nav-hamburger">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container" id="home">
+
+        <!-- Header Section -->
+        <header class="header-card card">
+            <div class="profile-section">
+                <div class="profile-image-wrapper">
+                    <img src="https://avatars.githubusercontent.com/SmitSuni" alt="Smit Alexander Suni Morales" class="profile-img">
+                    <div class="profile-ring"></div>
+                </div>
+                <div class="profile-info">
+                    <h1 class="name">Smit Alexander Suni Morales</h1>
+                    <p class="bio">Estudiante de la Universidad Nacional del Altiplano con formación y conocimientos en programación, estadística y áreas relacionadas con la ingeniería.</p>
+                    <blockquote class="quote">
+                        <i class="fas fa-quote-left"></i>
+                        Para ganar hay que tener corazón.
+                        <i class="fas fa-quote-right"></i>
+                    </blockquote>
+                </div>
+            </div>
+        </header>
+
+        <!-- Stats Counter Section -->
+        <section class="stats-section" id="stats">
+            <div class="stats-grid">
+                <div class="stat-card card">
+                    <i class="fas fa-project-diagram stat-icon"></i>
+                    <div class="stat-number" data-target="15">15</div>
+                    <div class="stat-label">Proyectos Completados</div>
+                </div>
+                <div class="stat-card card">
+                    <i class="fas fa-code stat-icon"></i>
+                    <div class="stat-number" data-target="12">12</div>
+                    <div class="stat-label">Tecnologías Dominadas</div>
+                </div>
+                <div class="stat-card card">
+                    <i class="fas fa-certificate stat-icon"></i>
+                    <div class="stat-number" data-target="500">500</div>
+                    <div class="stat-label">Horas de Código</div>
+                </div>
+                <div class="stat-card card">
+                    <i class="fas fa-trophy stat-icon"></i>
+                    <div class="stat-number" data-target="25">25</div>
+                    <div class="stat-label">Logros Académicos</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3D Building Animation -->
+        <div class="building-container card">
+            <h2 class="section-title">
+                <i class="fas fa-building"></i>
+                Construyendo el Futuro
+            </h2>
+            <div class="building-scene">
+                <div class="building-3d">
+                    <!-- Main Tower -->
+                    <div class="building-tower">
+                        <div class="building-floor"></div>
+                        <div class="building-floor"></div>
+                        <div class="building-floor"></div>
+                        <div class="building-floor"></div>
+                        <div class="building-floor"></div>
+                        <div class="building-floor"></div>
+                        <div class="building-floor"></div>
+                        <div class="building-floor"></div>
+                    </div>
+                    <!-- Left Wing -->
+                    <div class="building-wing wing-left">
+                        <div class="building-floor"></div>
+                        <div class="building-floor"></div>
+                        <div class="building-floor"></div>
+                        <div class="building-floor"></div>
+                    </div>
+                    <!-- Right Wing -->
+                    <div class="building-wing wing-right">
+                        <div class="building-floor"></div>
+                        <div class="building-floor"></div>
+                        <div class="building-floor"></div>
+                        <div class="building-floor"></div>
+                    </div>
+                    <!-- Antenna -->
+                    <div class="building-antenna"></div>
+                    <!-- Lights -->
+                    <div class="building-light light-1"></div>
+                    <div class="building-light light-2"></div>
+                    <div class="building-light light-3"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- About Me / Education -->
+        <section class="about-card card">
+            <h2 class="section-title">
+                <i class="fas fa-graduation-cap"></i>
+                Sobre Mí
+            </h2>
+            <div class="about-content">
+                <div class="about-item">
+                    <i class="fas fa-university"></i>
+                    <div>
+                        <h3>Universidad Nacional del Altiplano</h3>
+                        <p>Estudiante universitario en formación</p>
+                    </div>
+                </div>
+                <div class="about-item">
+                    <i class="fas fa-trophy"></i>
+                    <div>
+                        <h3>Logros Académicos</h3>
+                        <p>Desarrollo constante de proyectos académicos y aplicaciones funcionales aplicando conceptos de programación, estadística inferencial, álgebra matricial e interfaces gráficas.</p>
+                    </div>
+                </div>
+                <div class="about-item">
+                    <i class="fas fa-heart"></i>
+                    <div>
+                        <h3>Intereses</h3>
+                        <p>Desarrollo de software académico, análisis de datos, interfaces gráficas y la aplicación de la programación en problemas de ingeniería.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Timeline Section -->
+        <section class="timeline-section" id="timeline">
+            <h2 class="section-title main-title">
+                <i class="fas fa-timeline"></i>
+                Timeline de Logros
+            </h2>
+            <div class="timeline">
+                <div class="timeline-item card">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content">
+                        <div class="timeline-date">2024</div>
+                        <h3>Desarrollo de Proyectos Académicos</h3>
+                        <p>Implementación de sistemas estadísticos y aplicaciones de análisis con interfaces gráficas profesionales.</p>
+                        <div class="timeline-tags">
+                            <span class="timeline-tag">Python</span>
+                            <span class="timeline-tag">Estadística</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="timeline-item card">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content">
+                        <div class="timeline-date">2024</div>
+                        <h3>Aplicaciones WinAPI en C++</h3>
+                        <p>Desarrollo de herramientas matemáticas con graficación de funciones e implementación de métodos numéricos.</p>
+                        <div class="timeline-tags">
+                            <span class="timeline-tag">C++</span>
+                            <span class="timeline-tag">WinAPI</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="timeline-item card">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content">
+                        <div class="timeline-date">2023-2024</div>
+                        <h3>Álgebra Matricial y Regresión</h3>
+                        <p>Implementación de algoritmos de regresión lineal usando operaciones matriciales avanzadas.</p>
+                        <div class="timeline-tags">
+                            <span class="timeline-tag">Álgebra Lineal</span>
+                            <span class="timeline-tag">Machine Learning</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="timeline-item card">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content">
+                        <div class="timeline-date">2023</div>
+                        <h3>Bases de Datos y SQL</h3>
+                        <p>Diseño e implementación de sistemas de gestión académica con MariaDB.</p>
+                        <div class="timeline-tags">
+                            <span class="timeline-tag">MariaDB</span>
+                            <span class="timeline-tag">SQL</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Projects Section -->
+        <section class="projects-section" id="projects">
+            <h2 class="section-title main-title">
+                <i class="fas fa-code"></i>
+                Proyectos Destacados
+            </h2>
+
+            <div class="projects-grid">
+                <!-- Project 1 -->
+                <article class="project-card card">
+                    <div class="project-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <h3 class="project-title">Sistema de Estadística con Interfaz Gráfica</h3>
+                    <p class="project-description">Aplicación en Python que calcula medidas estadísticas y genera gráficos separados, con una interfaz profesional integrada.</p>
+                    <div class="project-tech">
+                        <span class="tech-tag">Python</span>
+                        <span class="tech-tag">Tkinter</span>
+                        <span class="tech-tag">Estadística</span>
+                    </div>
+                    <div class="project-status">
+                        <i class="fas fa-clock"></i>
+                        En desarrollo
+                    </div>
+                </article>
+
+                <!-- Project 2 -->
+                <article class="project-card card">
+                    <div class="project-icon">
+                        <i class="fas fa-book"></i>
+                    </div>
+                    <h3 class="project-title">Sistema de Biblioteca Universitaria</h3>
+                    <p class="project-description">Sistema de gestión para bibliotecas universitarias que permite registrar usuarios, gestionar reservas y mostrar información en una sola interfaz.</p>
+                    <div class="project-tech">
+                        <span class="tech-tag">Python</span>
+                        <span class="tech-tag">Tkinter</span>
+                    </div>
+                    <div class="project-status">
+                        <i class="fas fa-clock"></i>
+                        En desarrollo
+                    </div>
+                </article>
+
+                <!-- Project 3 -->
+                <article class="project-card card">
+                    <div class="project-icon">
+                        <i class="fas fa-function"></i>
+                    </div>
+                    <h3 class="project-title">Aplicación WinAPI – Integración Numérica</h3>
+                    <p class="project-description">Programa en C++ que grafica funciones matemáticas y calcula integrales usando el método del punto medio mediante una interfaz gráfica de escritorio.</p>
+                    <div class="project-tech">
+                        <span class="tech-tag">C++</span>
+                        <span class="tech-tag">WinAPI</span>
+                    </div>
+                    <div class="project-status">
+                        <i class="fas fa-clock"></i>
+                        En desarrollo
+                    </div>
+                </article>
+
+                <!-- Project 4 -->
+                <article class="project-card card">
+                    <div class="project-icon">
+                        <i class="fas fa-chart-scatter"></i>
+                    </div>
+                    <h3 class="project-title">Aplicación WinAPI – Regresión Lineal</h3>
+                    <p class="project-description">Implementación de regresión lineal simple y múltiple utilizando operaciones matriciales, con graficación de datos y predicción de resultados.</p>
+                    <div class="project-tech">
+                        <span class="tech-tag">C++</span>
+                        <span class="tech-tag">WinAPI</span>
+                        <span class="tech-tag">Álgebra Lineal</span>
+                    </div>
+                    <div class="project-status">
+                        <i class="fas fa-clock"></i>
+                        En desarrollo
+                    </div>
+                </article>
+
+                <!-- Project 5 -->
+                <article class="project-card card">
+                    <div class="project-icon">
+                        <i class="fas fa-database"></i>
+                    </div>
+                    <h3 class="project-title">Base de Datos Académica</h3>
+                    <p class="project-description">Diseño e implementación de una base de datos académica con estudiantes, docentes, cursos y calificaciones.</p>
+                    <div class="project-tech">
+                        <span class="tech-tag">MariaDB</span>
+                        <span class="tech-tag">SQL</span>
+                    </div>
+                    <div class="project-status">
+                        <i class="fas fa-clock"></i>
+                        En desarrollo
+                    </div>
+                </article>
+            </div>
+        </section>
+
+        <!-- Skills Section with Progress Bars -->
+        <section class="skills-card card" id="skills">
+            <h2 class="section-title">
+                <i class="fas fa-laptop-code"></i>
+                Habilidades Técnicas
+            </h2>
+            <div class="skills-container">
+                <div class="skill-item">
+                    <div class="skill-header">
+                        <span class="skill-name">
+                            <i class="fab fa-python"></i>
+                            Python
+                        </span>
+                        <span class="skill-percentage">90%</span>
+                    </div>
+                    <div class="skill-bar">
+                        <div class="skill-progress" data-progress="90"></div>
+                    </div>
+                </div>
+                <div class="skill-item">
+                    <div class="skill-header">
+                        <span class="skill-name">
+                            <i class="fas fa-code"></i>
+                            C++
+                        </span>
+                        <span class="skill-percentage">85%</span>
+                    </div>
+                    <div class="skill-bar">
+                        <div class="skill-progress" data-progress="85"></div>
+                    </div>
+                </div>
+                <div class="skill-item">
+                    <div class="skill-header">
+                        <span class="skill-name">
+                            <i class="fab fa-java"></i>
+                            Java
+                        </span>
+                        <span class="skill-percentage">75%</span>
+                    </div>
+                    <div class="skill-bar">
+                        <div class="skill-progress" data-progress="75"></div>
+                    </div>
+                </div>
+                <div class="skill-item">
+                    <div class="skill-header">
+                        <span class="skill-name">
+                            <i class="fas fa-database"></i>
+                            SQL / MariaDB
+                        </span>
+                        <span class="skill-percentage">80%</span>
+                    </div>
+                    <div class="skill-bar">
+                        <div class="skill-progress" data-progress="80"></div>
+                    </div>
+                </div>
+                <div class="skill-item">
+                    <div class="skill-header">
+                        <span class="skill-name">
+                            <i class="fab fa-python"></i>
+                            Tkinter
+                        </span>
+                        <span class="skill-percentage">85%</span>
+                    </div>
+                    <div class="skill-bar">
+                        <div class="skill-progress" data-progress="85"></div>
+                    </div>
+                </div>
+                <div class="skill-item">
+                    <div class="skill-header">
+                        <span class="skill-name">
+                            <i class="fab fa-windows"></i>
+                            WinAPI
+                        </span>
+                        <span class="skill-percentage">80%</span>
+                    </div>
+                    <div class="skill-bar">
+                        <div class="skill-progress" data-progress="80"></div>
+                    </div>
+                </div>
+                <div class="skill-item">
+                    <div class="skill-header">
+                        <span class="skill-name">
+                            <i class="fas fa-chart-bar"></i>
+                            SPSS / Estadística
+                        </span>
+                        <span class="skill-percentage">88%</span>
+                    </div>
+                    <div class="skill-bar">
+                        <div class="skill-progress" data-progress="88"></div>
+                    </div>
+                </div>
+                <div class="skill-item">
+                    <div class="skill-header">
+                        <span class="skill-name">
+                            <i class="fas fa-square-root-alt"></i>
+                            Álgebra Matricial
+                        </span>
+                        <span class="skill-percentage">82%</span>
+                    </div>
+                    <div class="skill-bar">
+                        <div class="skill-progress" data-progress="82"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- GitHub Integration Section -->
+        <section class="github-section card" id="github">
+            <h2 class="section-title">
+                <i class="fab fa-github"></i>
+                Actividad en GitHub
+            </h2>
+            <div id="github-stats" class="github-stats">
+                <div class="github-loading">
+                    <i class="fas fa-spinner fa-spin"></i>
+                    <p>Cargando datos de GitHub...</p>
+                </div>
+            </div>
+            <div id="github-repos" class="github-repos">
+                <!-- Repositorios se cargarán dinámicamente -->
+            </div>
+        </section>
+
+        <!-- Contact Section -->
+        <section class="contact-card card" id="contact">
+            <h2 class="section-title">
+                <i class="fas fa-link"></i>
+                Conecta Conmigo
+            </h2>
+            <div class="social-links">
+                <a href="https://github.com/SmitSuni" target="_blank" class="social-link github" rel="noopener noreferrer">
+                    <i class="fab fa-github"></i>
+                    <span>GitHub</span>
+                    <div class="link-arrow">→</div>
+                </a>
+                <a href="https://www.linkedin.com/in/smit-alexander-suni-morales-222736364/" target="_blank" class="social-link linkedin" rel="noopener noreferrer">
+                    <i class="fab fa-linkedin"></i>
+                    <span>LinkedIn</span>
+                    <div class="link-arrow">→</div>
+                </a>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>&copy; 2025 Smit Alexander Suni Morales. Todos los derechos reservados.</p>
+            <p class="footer-tech">Desarrollado con HTML, CSS y JavaScript | Powered by GitHub Pages</p>
+            <div class="footer-social">
+                <a href="https://github.com/SmitSuni" target="_blank"><i class="fab fa-github"></i></a>
+                <a href="https://www.linkedin.com/in/smit-alexander-suni-morales-222736364/" target="_blank"><i class="fab fa-linkedin"></i></a>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Scroll to Top Button -->
+    <button class="scroll-to-top" id="scrollToTop" aria-label="Scroll to top">
+        <i class="fas fa-arrow-up"></i>
+    </button>
+
+    <script src="script.js"></script>
+</body>
+</html>
