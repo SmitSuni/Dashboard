@@ -1,0 +1,1245 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Calculadora de Resistencia de Materiales según RNE Perú - CIP y CAPECO">
+    <meta name="author" content="Smit Alexander Suni Morales">
+    <meta name="keywords" content="resistencia de materiales, RNE, CIP, CAPECO, ingeniería civil Perú, E.060, E.020">
+
+    <meta name="theme-color" content="#0a0e14">
+    <meta name="color-scheme" content="dark light">
+
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://SmitSuni.github.io/Dashboard/tools/strength-of-materials.html">
+    <meta property="og:title" content="Calculadora de Resistencia de Materiales - RNE Perú">
+    <meta property="og:description" content="Herramienta profesional según normas del Colegio de Ingenieros del Perú">
+
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='0.9em' font-size='90'>🏗️</text></svg>">
+
+    <title>Resistencia de Materiales - RNE | Smit Alexander</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        :root[data-theme="dark"] {
+            --bg-primary: #0a0e14;
+            --bg-secondary: #151a21;
+            --bg-tertiary: #1f2937;
+            --bg-card: #1a1f2e;
+
+            --text-primary: #e6e9ef;
+            --text-secondary: #9ca3af;
+            --text-muted: #6b7280;
+
+            --accent-blue: #00d4ff;
+            --accent-green: #00ff88;
+            --accent-purple: #8b5cf6;
+            --accent-cyan: #06b6d4;
+            --accent-orange: #ff6b35;
+            --accent-red: #ef4444;
+
+            --border-color: #2d3748;
+            --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.4);
+            --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.6);
+            --shadow-glow: 0 0 20px rgba(0, 212, 255, 0.3);
+        }
+
+        :root[data-theme="light"] {
+            --bg-primary: #f0f4f8;
+            --bg-secondary: #ffffff;
+            --bg-tertiary: #e2e8f0;
+            --bg-card: #ffffff;
+
+            --text-primary: #1a202c;
+            --text-secondary: #4a5568;
+            --text-muted: #718096;
+
+            --accent-blue: #0088cc;
+            --accent-green: #00cc66;
+            --accent-purple: #7c3aed;
+            --accent-cyan: #0891b2;
+            --accent-orange: #ea580c;
+            --accent-red: #dc2626;
+
+            --border-color: #cbd5e0;
+            --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.15);
+            --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.2);
+            --shadow-glow: 0 0 20px rgba(0, 136, 204, 0.2);
+        }
+
+        body {
+            font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            line-height: 1.6;
+            transition: background 0.3s ease, color 0.3s ease;
+        }
+
+        .header {
+            background: var(--bg-card);
+            border-bottom: 2px solid var(--border-color);
+            padding: 1.5rem 2rem;
+            box-shadow: var(--shadow-md);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .header-title {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .header-icon {
+            font-size: 2rem;
+            color: var(--accent-blue);
+        }
+
+        .header-title h1 {
+            font-size: 1.6rem;
+            background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-green) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header-subtitle {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-top: 0.2rem;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .btn {
+            padding: 0.6rem 1.2rem;
+            background: var(--bg-tertiary);
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-primary);
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+        }
+
+        .btn:hover {
+            border-color: var(--accent-blue);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-glow);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+            border-color: transparent;
+            color: white;
+        }
+
+        .theme-toggle {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .theme-toggle i {
+            font-size: 1.2rem;
+            position: absolute;
+            transition: all 0.3s ease;
+        }
+
+        .theme-toggle .fa-sun {
+            color: var(--accent-orange);
+            transform: rotate(0deg);
+        }
+
+        .theme-toggle .fa-moon {
+            color: var(--accent-cyan);
+            transform: rotate(180deg) scale(0);
+        }
+
+        [data-theme="light"] .theme-toggle .fa-sun {
+            transform: rotate(180deg) scale(0);
+        }
+
+        [data-theme="light"] .theme-toggle .fa-moon {
+            transform: rotate(0deg) scale(1);
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .tabs-container {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 1.5rem;
+            box-shadow: var(--shadow-md);
+            margin-bottom: 2rem;
+        }
+
+        .tabs-header {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .tab-btn {
+            padding: 0.8rem 1.5rem;
+            background: var(--bg-secondary);
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-secondary);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.95rem;
+        }
+
+        .tab-btn:hover {
+            border-color: var(--accent-cyan);
+            color: var(--text-primary);
+        }
+
+        .tab-btn.active {
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+            border-color: transparent;
+            color: white;
+            box-shadow: var(--shadow-glow);
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .calc-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .input-group {
+            background: var(--bg-secondary);
+            padding: 1.5rem;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+        }
+
+        .input-label {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .input-label i {
+            color: var(--accent-cyan);
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            background: var(--bg-tertiary);
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-size: 1rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .input-field:focus {
+            outline: none;
+            border-color: var(--accent-blue);
+            box-shadow: 0 0 0 3px rgba(0, 212, 255, 0.1);
+        }
+
+        .unit-text {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-top: 0.3rem;
+        }
+
+        .calc-btn {
+            width: 100%;
+            padding: 1rem 1.5rem;
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.8rem;
+        }
+
+        .calc-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-lg), var(--shadow-glow);
+        }
+
+        .results-container {
+            background: linear-gradient(135deg, var(--bg-secondary), var(--bg-tertiary));
+            border: 2px solid var(--accent-green);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-top: 2rem;
+            display: none;
+        }
+
+        .results-container.show {
+            display: block;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        .result-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--accent-green);
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+
+        .result-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .result-item {
+            background: var(--bg-card);
+            padding: 1.2rem;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+
+        .result-label {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+        }
+
+        .result-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--accent-green);
+        }
+
+        .result-unit {
+            font-size: 1rem;
+            color: var(--text-muted);
+            margin-left: 0.3rem;
+        }
+
+        .select-field {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            background: var(--bg-tertiary);
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .select-field:focus {
+            outline: none;
+            border-color: var(--accent-blue);
+        }
+
+        .info-box {
+            background: var(--bg-secondary);
+            border-left: 4px solid var(--accent-cyan);
+            padding: 1.2rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+        }
+
+        .info-box-title {
+            font-weight: 600;
+            color: var(--accent-cyan);
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .info-box-text {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        .norm-badge {
+            display: inline-block;
+            background: var(--accent-purple);
+            color: white;
+            padding: 0.3rem 0.8rem;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-left: 0.5rem;
+        }
+
+        .formula-box {
+            background: var(--bg-tertiary);
+            padding: 1rem;
+            border-radius: 8px;
+            border: 1px solid var(--accent-purple);
+            margin: 1rem 0;
+            text-align: center;
+        }
+
+        .formula {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--accent-purple);
+            font-family: 'Courier New', monospace;
+            margin: 0.5rem 0;
+        }
+
+        .warning-box {
+            background: rgba(255, 107, 53, 0.1);
+            border-left: 4px solid var(--accent-orange);
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+        }
+
+        .warning-title {
+            font-weight: 600;
+            color: var(--accent-orange);
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .success-box {
+            background: rgba(0, 255, 136, 0.1);
+            border-left: 4px solid var(--accent-green);
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+        }
+
+        .success-title {
+            font-weight: 600;
+            color: var(--accent-green);
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 2rem;
+            border-top: 1px solid var(--border-color);
+            margin-top: 3rem;
+            color: var(--text-muted);
+        }
+
+        @media (max-width: 768px) {
+            .header-title h1 {
+                font-size: 1.2rem;
+            }
+
+            .tabs-header {
+                gap: 0.3rem;
+            }
+
+            .tab-btn {
+                padding: 0.6rem 1rem;
+                font-size: 0.85rem;
+            }
+
+            .calc-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-container">
+            <div class="header-title">
+                <i class="fas fa-hard-hat header-icon"></i>
+                <div>
+                    <h1>Resistencia de Materiales - RNE Perú</h1>
+                    <div class="header-subtitle">Según normas CIP y CAPECO</div>
+                </div>
+            </div>
+            <div class="header-actions">
+                <button class="btn theme-toggle" id="theme-toggle" aria-label="Toggle theme">
+                    <i class="fas fa-sun"></i>
+                    <i class="fas fa-moon"></i>
+                </button>
+                <a href="../index.html" class="btn btn-primary">
+                    <i class="fas fa-home"></i>
+                    Dashboard
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main class="container">
+        <div class="tabs-container">
+            <div class="tabs-header">
+                <button class="tab-btn active" data-tab="materials">
+                    <i class="fas fa-cubes"></i>
+                    Materiales
+                </button>
+                <button class="tab-btn" data-tab="loads">
+                    <i class="fas fa-weight"></i>
+                    Cargas E.020
+                </button>
+                <button class="tab-btn" data-tab="beam">
+                    <i class="fas fa-minus"></i>
+                    Vigas E.060
+                </button>
+                <button class="tab-btn" data-tab="column">
+                    <i class="fas fa-columns"></i>
+                    Columnas E.060
+                </button>
+                <button class="tab-btn" data-tab="slab">
+                    <i class="fas fa-layer-group"></i>
+                    Losas E.060
+                </button>
+            </div>
+
+            <!-- Tab 1: Propiedades de Materiales -->
+            <div class="tab-content active" id="materials">
+                <div class="info-box">
+                    <div class="info-box-title">
+                        <i class="fas fa-info-circle"></i>
+                        Propiedades de Materiales según RNE
+                        <span class="norm-badge">E.060</span>
+                    </div>
+                    <p class="info-box-text">
+                        Cálculo de propiedades mecánicas del concreto y acero según el Reglamento Nacional de Edificaciones del Perú.
+                    </p>
+                </div>
+
+                <div class="calc-grid">
+                    <div class="input-group">
+                        <label class="input-label">
+                            <i class="fas fa-cube"></i>
+                            Resistencia del Concreto (f'c)
+                        </label>
+                        <select class="select-field" id="fc">
+                            <option value="175">175 kg/cm²</option>
+                            <option value="210" selected>210 kg/cm²</option>
+                            <option value="280">280 kg/cm²</option>
+                            <option value="350">350 kg/cm²</option>
+                            <option value="420">420 kg/cm²</option>
+                        </select>
+                    </div>
+
+                    <div class="input-group">
+                        <label class="input-label">
+                            <i class="fas fa-bars"></i>
+                            Acero de Refuerzo (fy)
+                        </label>
+                        <select class="select-field" id="fy">
+                            <option value="4200" selected>4200 kg/cm² (Grado 60)</option>
+                            <option value="2800">2800 kg/cm² (Grado 40)</option>
+                            <option value="5600">5600 kg/cm² (Grado 75)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <button class="calc-btn" onclick="calculateMaterials()">
+                    <i class="fas fa-calculator"></i>
+                    Calcular Propiedades
+                </button>
+
+                <div class="results-container" id="materialsResults">
+                    <div class="result-title">
+                        <i class="fas fa-check-circle"></i>
+                        Propiedades Calculadas
+                    </div>
+                    <div class="result-grid">
+                        <div class="result-item">
+                            <div class="result-label">Módulo de Elasticidad (Ec)</div>
+                            <div class="result-value" id="ec">0<span class="result-unit">kg/cm²</span></div>
+                        </div>
+                        <div class="result-item">
+                            <div class="result-label">Módulo de Elasticidad Acero (Es)</div>
+                            <div class="result-value" id="es">2,000,000<span class="result-unit">kg/cm²</span></div>
+                        </div>
+                        <div class="result-item">
+                            <div class="result-label">Peso Específico Concreto</div>
+                            <div class="result-value" id="gamma">2400<span class="result-unit">kg/m³</span></div>
+                        </div>
+                        <div class="result-item">
+                            <div class="result-label">Relación Modular (n)</div>
+                            <div class="result-value" id="modulRatio">0<span class="result-unit"></span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab 2: Cargas según E.020 -->
+            <div class="tab-content" id="loads">
+                <div class="info-box">
+                    <div class="info-box-title">
+                        <i class="fas fa-info-circle"></i>
+                        Cálculo de Cargas según Norma E.020
+                        <span class="norm-badge">E.020</span>
+                    </div>
+                    <p class="info-box-text">
+                        Determinación de cargas muertas, vivas y combinaciones de carga según el RNE.
+                    </p>
+                </div>
+
+                <div class="calc-grid">
+                    <div class="input-group">
+                        <label class="input-label">
+                            <i class="fas fa-home"></i>
+                            Tipo de Edificación
+                        </label>
+                        <select class="select-field" id="buildingType" onchange="updateLiveLoad()">
+                            <option value="200">Vivienda</option>
+                            <option value="250">Oficinas</option>
+                            <option value="300">Aulas</option>
+                            <option value="400">Lugares de reunión</option>
+                            <option value="500">Almacenes</option>
+                            <option value="1000">Archivos y bibliotecas</option>
+                        </select>
+                        <div class="unit-text" id="liveLoadText">Carga viva: 200 kg/m²</div>
+                    </div>
+
+                    <div class="input-group">
+                        <label class="input-label">
+                            <i class="fas fa-ruler-combined"></i>
+                            Espesor de Losa (e)
+                        </label>
+                        <input type="number" class="input-field" id="slabThickness" value="0.20" step="0.01">
+                        <div class="unit-text">metros (m)</div>
+                    </div>
+
+                    <div class="input-group">
+                        <label class="input-label">
+                            <i class="fas fa-layer-group"></i>
+                            Acabados y Tabiquería
+                        </label>
+                        <input type="number" class="input-field" id="finishes" value="100" step="10">
+                        <div class="unit-text">kg/m²</div>
+                    </div>
+
+                    <div class="input-group">
+                        <label class="input-label">
+                            <i class="fas fa-expand"></i>
+                            Área Tributaria
+                        </label>
+                        <input type="number" class="input-field" id="area" value="20" step="0.1">
+                        <div class="unit-text">m²</div>
+                    </div>
+                </div>
+
+                <button class="calc-btn" onclick="calculateLoads()">
+                    <i class="fas fa-calculator"></i>
+                    Calcular Cargas
+                </button>
+
+                <div class="results-container" id="loadsResults">
+                    <div class="result-title">
+                        <i class="fas fa-check-circle"></i>
+                        Resultados de Cargas
+                    </div>
+                    <div class="result-grid">
+                        <div class="result-item">
+                            <div class="result-label">Carga Muerta (CM)</div>
+                            <div class="result-value" id="deadLoad">0<span class="result-unit">kg/m²</span></div>
+                        </div>
+                        <div class="result-item">
+                            <div class="result-label">Carga Viva (CV)</div>
+                            <div class="result-value" id="liveLoad">0<span class="result-unit">kg/m²</span></div>
+                        </div>
+                        <div class="result-item">
+                            <div class="result-label">Carga Última (CU)</div>
+                            <div class="result-value" id="ultimateLoad">0<span class="result-unit">kg/m²</span></div>
+                        </div>
+                        <div class="result-item">
+                            <div class="result-label">Carga Total en Área</div>
+                            <div class="result-value" id="totalLoad">0<span class="result-unit">kg</span></div>
+                        </div>
+                    </div>
+                    <div class="formula-box">
+                        <div class="formula">CU = 1.4 CM + 1.7 CV</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab 3: Diseño de Vigas -->
+            <div class="tab-content" id="beam">
+                <div class="info-box">
+                    <div class="info-box-title">
+                        <i class="fas fa-info-circle"></i>
+                        Diseño de Vigas de Concreto Armado
+                        <span class="norm-badge">E.060</span>
+                    </div>
+                    <p class="info-box-text">
+                        Cálculo de momento resistente y área de acero requerida para vigas rectangulares.
+                    </p>
+                </div>
+
+                <div class="calc-grid">
+                    <div class="input-group">
+                        <label class="input-label">
+                            <i class="fas fa-cube"></i>
+                            f'c
+                        </label>
+                        <input type="number" class="input-field" id="beamFc" value="210">
+                        <div class="unit-text">kg/cm²</div>
+                    </div>
+
+                    <div class="input-group">
+                        <label class="input-label">
+                            <i class="fas fa-bars"></i>
+                            fy
+                        </label>
+                        <input type="number" class="input-field" id="beamFy" value="4200">
+                        <div class="unit-text">kg/cm²</div>
+                    </div>
+
+                    <div class="input-group">
+                        <label class="input-label">
+                            <i class="fas fa-arrows-alt-h"></i>
+                            Base (b)
+                        </label>
+                        <input type="number" class="input-field" id="beamB" value="25">
+                        <div class="unit-text">cm</div>
+                    </div>
+
+                    <div class="input-group">
+                        <label class="input-label">
+                            <i class="fas fa-arrows-alt-v"></i>
+                            Altura (h)
+                        </label>
+                        <input type="number" class="input-field" id="beamH" value="50">
+                        <div class="unit-text">cm</div>
+                    </div>
+
+                    <div class="input-group">
+                        <label class="input-label">
+                            <i class="fas fa-ruler"></i>
+                            Recubrimiento
+                        </label>
+                        <input type="number" class="input-field" id="cover" value="4">
+                        <div class="unit-text">cm</div>
+                    </div>
+
+                    <div class="input-group">
+                        <label class="input-label">
+                            <i class="fas fa-sync"></i>
+                            Momento Último (Mu)
+                        </label>
+                        <input type="number" class="input-field" id="mu" value="10000">
+                        <div class="unit-text">kg-cm</div>
+                    </div>
+                </div>
+
+                <button class="calc-btn" onclick="calculateBeam()">
+                    <i class="fas fa-calculator"></i>
+                    Diseñar Viga
+                </button>
+
+                <div class="results-container" id="beamResults">
+                    <div class="result-title">
+                        <i class="fas fa-check-circle"></i>
+                        Diseño de Viga
+                    </div>
+                    <div class="result-grid">
+                        <div class="result-item">
+                            <div class="result-label">Peralte Efectivo (d)</div>
+                            <div class="result-value" id="d">0<span class="result-unit">cm</span></div>
+                        </div>
+                        <div class="result-item">
+                            <div class="result-label">Cuantía (ρ)</div>
+                            <div class="result-value" id="rho">0<span class="result-unit"></span></div>
+                        </div>
+                        <div class="result-item">
+                            <div class="result-label">Área de Acero (As)</div>
+                            <div class="result-value" id="as">0<span class="result-unit">cm²</span></div>
+                        </div>
+                        <div class="result-item">
+                            <div class="result-label">Momento Resistente (φMn)</div>
+                            <div class="result-value" id="phi_mn">0<span class="result-unit">kg-cm</span></div>
+                        </div>
+                    </div>
+                    <div id="beamVerification"></div>
+                </div>
+            </div>
+
+            <!-- Tab 4: Columnas -->
+            <div class="tab-content" id="column">
+                <div class="info-box">
+                    <div class="info-box-title">
+                        <i class="fas fa-info-circle"></i>
+                        Diseño de Columnas de Concreto Armado
+                        <span class="norm-badge">E.060</span>
+                    </div>
+                    <p class="info-box-text">
+                        Verificación de capacidad de columnas sometidas a compresión axial.
+                    </p>
+                </div>
+
+                <div class="calc-grid">
+                    <div class="input-group">
+                        <label class="input-label">
+                            <i class="fas fa-cube"></i>
+                            f'c
+                        </label>
+                        <input type="number" class="input-field" id="colFc" value="210">
+                        <div class="unit-text">kg/cm²</div>
+                    </div>
+
+                    <div class="input-group">
+                        <label class="input-label">
+                            <i class="fas fa-bars"></i>
+                            fy
+                        </label>
+                        <input type="number" class="input-field" id="colFy" value="4200">
+                        <div class="unit-text">kg/cm²</div>
+                    </div>
+
+                    <div class="input-group">
+                        <label class="input-label">
+                            <i class="fas fa-square"></i>
+                            Dimensión (t)
+                        </label>
+                        <input type="number" class="input-field" id="colT" value="25">
+                        <div class="unit-text">cm (columna cuadrada)</div>
+                    </div>
+
+                    <div class="input-group">
+                        <label class="input-label">
+                            <i class="fas fa-ruler-vertical"></i>
+                            Altura (H)
+                        </label>
+                        <input type="number" class="input-field" id="colH" value="300">
+                        <div class="unit-text">cm</div>
+                    </div>
+
+                    <div class="input-group">
+                        <label class="input-label">
+                            <i class="fas fa-percentage"></i>
+                            Cuantía de Acero (ρ)
+                        </label>
+                        <input type="number" class="input-field" id="colRho" value="1.5" step="0.1">
+                        <div class="unit-text">% (entre 1% y 6%)</div>
+                    </div>
+                </div>
+
+                <button class="calc-btn" onclick="calculateColumn()">
+                    <i class="fas fa-calculator"></i>
+                    Diseñar Columna
+                </button>
+
+                <div class="results-container" id="columnResults">
+                    <div class="result-title">
+                        <i class="fas fa-check-circle"></i>
+                        Capacidad de Columna
+                    </div>
+                    <div class="result-grid">
+                        <div class="result-item">
+                            <div class="result-label">Área de Concreto (Ag)</div>
+                            <div class="result-value" id="ag">0<span class="result-unit">cm²</span></div>
+                        </div>
+                        <div class="result-item">
+                            <div class="result-label">Área de Acero (Ast)</div>
+                            <div class="result-value" id="ast">0<span class="result-unit">cm²</span></div>
+                        </div>
+                        <div class="result-item">
+                            <div class="result-label">Carga Axial (φPn)</div>
+                            <div class="result-value" id="phi_pn">0<span class="result-unit">kg</span></div>
+                        </div>
+                        <div class="result-item">
+                            <div class="result-label">Esbeltez (klu/r)</div>
+                            <div class="result-value" id="slenderness">0<span class="result-unit"></span></div>
+                        </div>
+                    </div>
+                    <div id="columnVerification"></div>
+                </div>
+            </div>
+
+            <!-- Tab 5: Losas -->
+            <div class="tab-content" id="slab">
+                <div class="info-box">
+                    <div class="info-box-title">
+                        <i class="fas fa-info-circle"></i>
+                        Diseño de Losas Aligeradas
+                        <span class="norm-badge">E.060</span>
+                    </div>
+                    <p class="info-box-text">
+                        Verificación de espesores mínimos y cálculo de acero de refuerzo en losas.
+                    </p>
+                </div>
+
+                <div class="calc-grid">
+                    <div class="input-group">
+                        <label class="input-label">
+                            <i class="fas fa-ruler-horizontal"></i>
+                            Luz Libre (L)
+                        </label>
+                        <input type="number" class="input-field" id="span" value="4.5" step="0.1">
+                        <div class="unit-text">metros (m)</div>
+                    </div>
+
+                    <div class="input-group">
+                        <label class="input-label">
+                            <i class="fas fa-layer-group"></i>
+                            Tipo de Losa
+                        </label>
+                        <select class="select-field" id="slabType" onchange="updateSlabType()">
+                            <option value="aligerada">Losa Aligerada (h = 17, 20, 25, 30 cm)</option>
+                            <option value="maciza">Losa Maciza</option>
+                        </select>
+                    </div>
+
+                    <div class="input-group">
+                        <label class="input-label">
+                            <i class="fas fa-arrows-alt-v"></i>
+                            Espesor de Losa (h)
+                        </label>
+                        <input type="number" class="input-field" id="slabH" value="20" step="1">
+                        <div class="unit-text">cm</div>
+                    </div>
+
+                    <div class="input-group">
+                        <label class="input-label">
+                            <i class="fas fa-weight"></i>
+                            Carga Última (Wu)
+                        </label>
+                        <input type="number" class="input-field" id="wu" value="800" step="10">
+                        <div class="unit-text">kg/m²</div>
+                    </div>
+                </div>
+
+                <button class="calc-btn" onclick="calculateSlab()">
+                    <i class="fas fa-calculator"></i>
+                    Verificar Losa
+                </button>
+
+                <div class="results-container" id="slabResults">
+                    <div class="result-title">
+                        <i class="fas fa-check-circle"></i>
+                        Verificación de Losa
+                    </div>
+                    <div class="result-grid">
+                        <div class="result-item">
+                            <div class="result-label">Espesor Mínimo (hmin)</div>
+                            <div class="result-value" id="hmin">0<span class="result-unit">cm</span></div>
+                        </div>
+                        <div class="result-item">
+                            <div class="result-label">Momento Último (Mu)</div>
+                            <div class="result-value" id="slabMu">0<span class="result-unit">kg-m</span></div>
+                        </div>
+                        <div class="result-item">
+                            <div class="result-label">Acero Requerido (As)</div>
+                            <div class="result-value" id="slabAs">0<span class="result-unit">cm²/m</span></div>
+                        </div>
+                        <div class="result-item">
+                            <div class="result-label">Deflexión Máxima</div>
+                            <div class="result-value" id="deflection">0<span class="result-unit">cm</span></div>
+                        </div>
+                    </div>
+                    <div id="slabVerification"></div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <p>&copy; 2025 Smit Alexander Suni Morales. Todos los derechos reservados.</p>
+        <p style="margin-top: 0.5rem; color: var(--accent-cyan);">
+            Calculadora según Reglamento Nacional de Edificaciones del Perú (RNE)
+        </p>
+        <p style="margin-top: 0.3rem; font-size: 0.85rem;">
+            Normas: E.020 (Cargas) | E.060 (Concreto Armado) | E.090 (Estructuras Metálicas)
+        </p>
+    </footer>
+
+    <script>
+        function initTheme() {
+            const currentTheme = localStorage.getItem('theme') || 'dark';
+            document.documentElement.setAttribute('data-theme', currentTheme);
+
+            const themeToggle = document.getElementById('theme-toggle');
+            themeToggle.addEventListener('click', () => {
+                const theme = document.documentElement.getAttribute('data-theme');
+                const newTheme = theme === 'dark' ? 'light' : 'dark';
+                document.documentElement.setAttribute('data-theme', newTheme);
+                localStorage.setItem('theme', newTheme);
+            });
+        }
+
+        function initTabs() {
+            const tabBtns = document.querySelectorAll('.tab-btn');
+            const tabContents = document.querySelectorAll('.tab-content');
+
+            tabBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const targetTab = btn.getAttribute('data-tab');
+
+                    tabBtns.forEach(b => b.classList.remove('active'));
+                    tabContents.forEach(c => c.classList.remove('active'));
+
+                    btn.classList.add('active');
+                    document.getElementById(targetTab).classList.add('active');
+                });
+            });
+        }
+
+        // Propiedades de Materiales
+        function calculateMaterials() {
+            const fc = parseFloat(document.getElementById('fc').value);
+            const fy = parseFloat(document.getElementById('fy').value);
+
+            const Ec = 15000 * Math.sqrt(fc);
+            const Es = 2000000;
+            const gamma = 2400;
+            const n = Es / Ec;
+
+            document.getElementById('ec').innerHTML = `${Ec.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}<span class="result-unit">kg/cm²</span>`;
+            document.getElementById('es').innerHTML = `${Es.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}<span class="result-unit">kg/cm²</span>`;
+            document.getElementById('gamma').innerHTML = `${gamma}<span class="result-unit">kg/m³</span>`;
+            document.getElementById('modulRatio').innerHTML = `${n.toFixed(2)}<span class="result-unit"></span>`;
+
+            document.getElementById('materialsResults').classList.add('show');
+        }
+
+        // Cargas E.020
+        function updateLiveLoad() {
+            const liveLoadValue = document.getElementById('buildingType').value;
+            document.getElementById('liveLoadText').textContent = `Carga viva: ${liveLoadValue} kg/m²`;
+        }
+
+        function calculateLoads() {
+            const slabThick = parseFloat(document.getElementById('slabThickness').value);
+            const finishes = parseFloat(document.getElementById('finishes').value);
+            const liveLoadValue = parseFloat(document.getElementById('buildingType').value);
+            const area = parseFloat(document.getElementById('area').value);
+
+            const CM = (slabThick * 2400) + finishes;
+            const CV = liveLoadValue;
+            const CU = 1.4 * CM + 1.7 * CV;
+            const totalLoad = CU * area;
+
+            document.getElementById('deadLoad').innerHTML = `${CM.toFixed(2)}<span class="result-unit">kg/m²</span>`;
+            document.getElementById('liveLoad').innerHTML = `${CV.toFixed(2)}<span class="result-unit">kg/m²</span>`;
+            document.getElementById('ultimateLoad').innerHTML = `${CU.toFixed(2)}<span class="result-unit">kg/m²</span>`;
+            document.getElementById('totalLoad').innerHTML = `${totalLoad.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}<span class="result-unit">kg</span>`;
+
+            document.getElementById('loadsResults').classList.add('show');
+        }
+
+        // Diseño de Vigas
+        function calculateBeam() {
+            const fc = parseFloat(document.getElementById('beamFc').value);
+            const fy = parseFloat(document.getElementById('beamFy').value);
+            const b = parseFloat(document.getElementById('beamB').value);
+            const h = parseFloat(document.getElementById('beamH').value);
+            const cover = parseFloat(document.getElementById('cover').value);
+            const Mu = parseFloat(document.getElementById('mu').value);
+
+            const d = h - cover - 1.27;
+            const beta1 = fc <= 280 ? 0.85 : 0.85 - 0.05 * (fc - 280) / 70;
+            const rho_min = 0.7 * Math.sqrt(fc) / fy;
+            const rho_max = (0.85 * beta1 * fc * 0.003) / (fy * (0.003 + 0.005));
+
+            const Rn = Mu / (0.9 * b * d * d);
+            const rho = (0.85 * fc / fy) * (1 - Math.sqrt(1 - (2 * Rn) / (0.85 * fc)));
+
+            let rho_final = rho;
+            if (rho < rho_min) rho_final = rho_min;
+            if (rho > rho_max) rho_final = rho_max;
+
+            const As = rho_final * b * d;
+            const a = (As * fy) / (0.85 * fc * b);
+            const Mn = As * fy * (d - a / 2);
+            const phi_Mn = 0.9 * Mn;
+
+            document.getElementById('d').innerHTML = `${d.toFixed(2)}<span class="result-unit">cm</span>`;
+            document.getElementById('rho').innerHTML = `${(rho_final * 100).toFixed(4)}<span class="result-unit">%</span>`;
+            document.getElementById('as').innerHTML = `${As.toFixed(2)}<span class="result-unit">cm²</span>`;
+            document.getElementById('phi_mn').innerHTML = `${phi_Mn.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}<span class="result-unit">kg-cm</span>`;
+
+            const verification = document.getElementById('beamVerification');
+            if (phi_Mn >= Mu) {
+                verification.innerHTML = `<div class="success-box"><div class="success-title"><i class="fas fa-check-circle"></i> Viga OK</div><p style="color: var(--text-secondary);">φMn (${phi_Mn.toFixed(0)}) ≥ Mu (${Mu.toFixed(0)}) ✓</p></div>`;
+            } else {
+                verification.innerHTML = `<div class="warning-box"><div class="warning-title"><i class="fas fa-exclamation-triangle"></i> Advertencia</div><p style="color: var(--text-secondary);">φMn (${phi_Mn.toFixed(0)}) < Mu (${Mu.toFixed(0)}). Aumentar dimensiones o f'c.</p></div>`;
+            }
+
+            document.getElementById('beamResults').classList.add('show');
+        }
+
+        // Diseño de Columnas
+        function calculateColumn() {
+            const fc = parseFloat(document.getElementById('colFc').value);
+            const fy = parseFloat(document.getElementById('colFy').value);
+            const t = parseFloat(document.getElementById('colT').value);
+            const H = parseFloat(document.getElementById('colH').value);
+            const rho_percent = parseFloat(document.getElementById('colRho').value);
+
+            const Ag = t * t;
+            const rho = rho_percent / 100;
+            const Ast = rho * Ag;
+
+            const Po = 0.85 * fc * (Ag - Ast) + fy * Ast;
+            const phi_Pn = 0.65 * 0.80 * Po;
+
+            const r = t / Math.sqrt(12);
+            const k = 1.0;
+            const slenderness = (k * H) / r;
+
+            document.getElementById('ag').innerHTML = `${Ag.toFixed(2)}<span class="result-unit">cm²</span>`;
+            document.getElementById('ast').innerHTML = `${Ast.toFixed(2)}<span class="result-unit">cm²</span>`;
+            document.getElementById('phi_pn').innerHTML = `${phi_Pn.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}<span class="result-unit">kg</span>`;
+            document.getElementById('slenderness').innerHTML = `${slenderness.toFixed(2)}<span class="result-unit"></span>`;
+
+            const verification = document.getElementById('columnVerification');
+            if (slenderness < 22) {
+                verification.innerHTML = `<div class="success-box"><div class="success-title"><i class="fas fa-check-circle"></i> Columna Corta</div><p style="color: var(--text-secondary);">klu/r = ${slenderness.toFixed(2)} < 22. No requiere análisis de esbeltez.</p></div>`;
+            } else {
+                verification.innerHTML = `<div class="warning-box"><div class="warning-title"><i class="fas fa-exclamation-triangle"></i> Columna Esbelta</div><p style="color: var(--text-secondary);">klu/r = ${slenderness.toFixed(2)} ≥ 22. Considerar efectos de esbeltez.</p></div>`;
+            }
+
+            document.getElementById('columnResults').classList.add('show');
+        }
+
+        // Losas
+        function updateSlabType() {
+            const type = document.getElementById('slabType').value;
+            const slabHInput = document.getElementById('slabH');
+
+            if (type === 'aligerada') {
+                slabHInput.value = 20;
+            } else {
+                slabHInput.value = 15;
+            }
+        }
+
+        function calculateSlab() {
+            const L = parseFloat(document.getElementById('span').value) * 100;
+            const type = document.getElementById('slabType').value;
+            const h = parseFloat(document.getElementById('slabH').value);
+            const wu = parseFloat(document.getElementById('wu').value) / 10000;
+
+            let hmin;
+            if (type === 'aligerada') {
+                hmin = L / 25;
+            } else {
+                hmin = L / 28;
+            }
+
+            const Mu = (wu * Math.pow(L, 2)) / 8;
+            const fc = 210;
+            const fy = 4200;
+            const b = 100;
+            const d = h - 4;
+
+            const Rn = (Mu * 100000) / (0.9 * b * d * d);
+            const rho = (0.85 * fc / fy) * (1 - Math.sqrt(1 - (2 * Rn) / (0.85 * fc)));
+            const As = rho * b * d;
+
+            const E = 15000 * Math.sqrt(fc);
+            const I = (b * Math.pow(h, 3)) / 12;
+            const deflection = (5 * wu * Math.pow(L, 4)) / (384 * E * I) * 100000;
+
+            document.getElementById('hmin').innerHTML = `${hmin.toFixed(2)}<span class="result-unit">cm</span>`;
+            document.getElementById('slabMu').innerHTML = `${(Mu / 100).toFixed(2)}<span class="result-unit">kg-m</span>`;
+            document.getElementById('slabAs').innerHTML = `${As.toFixed(2)}<span class="result-unit">cm²/m</span>`;
+            document.getElementById('deflection').innerHTML = `${deflection.toFixed(4)}<span class="result-unit">cm</span>`;
+
+            const verification = document.getElementById('slabVerification');
+            if (h >= hmin) {
+                verification.innerHTML = `<div class="success-box"><div class="success-title"><i class="fas fa-check-circle"></i> Espesor OK</div><p style="color: var(--text-secondary);">h (${h} cm) ≥ hmin (${hmin.toFixed(2)} cm) ✓</p></div>`;
+            } else {
+                verification.innerHTML = `<div class="warning-box"><div class="warning-title"><i class="fas fa-exclamation-triangle"></i> Advertencia</div><p style="color: var(--text-secondary);">h (${h} cm) < hmin (${hmin.toFixed(2)} cm). Aumentar espesor.</p></div>`;
+            }
+
+            document.getElementById('slabResults').classList.add('show');
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            initTheme();
+            initTabs();
+            updateLiveLoad();
+            console.log('🏗️ Calculadora de Resistencia de Materiales - RNE Perú cargada');
+        });
+    </script>
+</body>
+</html>
