@@ -1290,6 +1290,146 @@ body {
 }
 
 /* ===========================
+   TOOLS SECTION
+   =========================== */
+.tools-section {
+    margin: 3rem 0;
+}
+
+.tools-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 2rem;
+}
+
+.tool-card {
+    background: var(--bg-secondary);
+    border: 2px solid var(--border-color);
+    padding: 2rem;
+    text-decoration: none;
+    color: inherit;
+    display: flex;
+    flex-direction: column;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.tool-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 3px;
+    background: linear-gradient(90deg, var(--accent-blue), var(--accent-green));
+    transition: left 0.5s ease;
+}
+
+.tool-card:hover::before {
+    left: 100%;
+}
+
+.tool-card:hover {
+    transform: translateY(-8px) scale(1.02);
+    border-color: var(--accent-blue);
+    box-shadow: 0 16px 40px rgba(0, 212, 255, 0.4);
+}
+
+.tool-icon {
+    width: 80px;
+    height: 80px;
+    background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1.5rem;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(0, 212, 255, 0.3);
+}
+
+.tool-card:hover .tool-icon {
+    transform: scale(1.1) rotate(5deg);
+    box-shadow: 0 8px 24px rgba(139, 92, 246, 0.6);
+}
+
+.tool-icon i {
+    font-size: 2.5rem;
+    color: white;
+}
+
+.tool-title {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+    color: var(--text-primary);
+    font-weight: 700;
+}
+
+.tool-description {
+    color: var(--text-secondary);
+    line-height: 1.7;
+    margin-bottom: 1.5rem;
+    flex-grow: 1;
+}
+
+.tool-features {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.8rem;
+    margin-bottom: 1.5rem;
+}
+
+.feature-tag {
+    background: var(--bg-tertiary);
+    color: var(--accent-cyan);
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    border: 1px solid var(--accent-cyan);
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    transition: all 0.2s ease;
+}
+
+.feature-tag i {
+    font-size: 0.8rem;
+}
+
+.tool-card:hover .feature-tag {
+    background: var(--accent-cyan);
+    color: var(--bg-primary);
+}
+
+.tool-action {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 1.5rem;
+    background: var(--bg-tertiary);
+    border-radius: 10px;
+    font-weight: 600;
+    color: var(--accent-blue);
+    transition: all 0.3s ease;
+}
+
+.tool-card:hover .tool-action {
+    background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+    color: white;
+    transform: translateX(5px);
+}
+
+.tool-action i {
+    transition: transform 0.3s ease;
+}
+
+.tool-card:hover .tool-action i {
+    transform: translateX(5px);
+}
+
+/* ===========================
    SCROLLBAR STYLING
    =========================== */
 ::-webkit-scrollbar {
