@@ -1,0 +1,1295 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora de Estadística | SmitSuni</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #6366f1;
+            --secondary-color: #8b5cf6;
+            --background-color: #0f172a;
+            --card-background: #1e293b;
+            --text-color: #e2e8f0;
+            --border-color: #334155;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --error-color: #ef4444;
+        }
+
+        [data-theme="light"] {
+            --background-color: #f8fafc;
+            --card-background: #ffffff;
+            --text-color: #1e293b;
+            --border-color: #e2e8f0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--background-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            min-height: 100vh;
+            transition: background-color 0.3s ease;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 3rem;
+            position: relative;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
+        }
+
+        .subtitle {
+            color: var(--text-color);
+            opacity: 0.8;
+            font-size: 1.1rem;
+        }
+
+        .back-btn {
+            position: absolute;
+            left: 0;
+            top: 0;
+            padding: 0.5rem 1rem;
+            background: var(--card-background);
+            color: var(--text-color);
+            text-decoration: none;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+        }
+
+        .back-btn:hover {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .theme-toggle {
+            position: absolute;
+            right: 0;
+            top: 0;
+            padding: 0.5rem 1rem;
+            background: var(--card-background);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            cursor: pointer;
+            color: var(--text-color);
+            transition: all 0.3s ease;
+        }
+
+        .theme-toggle:hover {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .info-box {
+            background: var(--card-background);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .info-box h3 {
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .info-card {
+            background: var(--background-color);
+            padding: 1rem;
+            border-radius: 8px;
+            border-left: 3px solid var(--primary-color);
+        }
+
+        .info-card h4 {
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .info-card p {
+            font-size: 0.85rem;
+            opacity: 0.9;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .tab {
+            padding: 0.75rem 1.5rem;
+            background: var(--card-background);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .tab:hover {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        .tab.active {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border-color: transparent;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .card {
+            background: var(--card-background);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--primary-color);
+        }
+
+        input[type="text"],
+        input[type="number"],
+        textarea,
+        select {
+            width: 100%;
+            padding: 0.75rem;
+            background: var(--background-color);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-color);
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        textarea {
+            min-height: 150px;
+            font-family: 'Courier New', monospace;
+            resize: vertical;
+        }
+
+        input:focus,
+        textarea:focus,
+        select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+
+        .radio-group {
+            display: flex;
+            gap: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .radio-option {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .radio-option input[type="radio"] {
+            width: auto;
+            accent-color: var(--primary-color);
+        }
+
+        .btn {
+            padding: 0.75rem 2rem;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(99, 102, 241, 0.3);
+        }
+
+        .btn-secondary {
+            background: var(--card-background);
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-secondary:hover {
+            background: var(--background-color);
+        }
+
+        .results {
+            display: none;
+            margin-top: 2rem;
+        }
+
+        .results.show {
+            display: block;
+        }
+
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: var(--background-color);
+            padding: 1.5rem;
+            border-radius: 8px;
+            border-left: 3px solid var(--primary-color);
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .stat-label {
+            font-size: 0.85rem;
+            opacity: 0.8;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+
+        .stat-unit {
+            font-size: 0.9rem;
+            opacity: 0.7;
+            margin-left: 0.25rem;
+        }
+
+        .chart-container {
+            background: var(--background-color);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .chart-title {
+            text-align: center;
+            margin-bottom: 1.5rem;
+            font-size: 1.2rem;
+            color: var(--primary-color);
+        }
+
+        #statisticsChart {
+            width: 100%;
+            height: auto;
+            min-height: 400px;
+        }
+
+        .interpretation {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(139, 92, 246, 0.1));
+            border: 1px solid var(--primary-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .interpretation h3 {
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .interpretation ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .interpretation li {
+            padding: 0.5rem 0;
+            padding-left: 1.5rem;
+            position: relative;
+        }
+
+        .interpretation li:before {
+            content: "▸";
+            position: absolute;
+            left: 0;
+            color: var(--primary-color);
+        }
+
+        .table-container {
+            overflow-x: auto;
+            margin-top: 1rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--background-color);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        th, td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        th {
+            background: var(--primary-color);
+            color: white;
+            font-weight: 600;
+        }
+
+        tr:hover {
+            background: var(--card-background);
+        }
+
+        /* SVG Animations */
+        .animated-bar {
+            animation: growBar 0.8s ease-out forwards;
+            transform-origin: bottom;
+        }
+
+        @keyframes growBar {
+            from {
+                transform: scaleY(0);
+                opacity: 0;
+            }
+            to {
+                transform: scaleY(1);
+                opacity: 1;
+            }
+        }
+
+        .animated-line {
+            stroke-dasharray: 1000;
+            stroke-dashoffset: 1000;
+            animation: drawLine 2s ease-out forwards;
+        }
+
+        @keyframes drawLine {
+            to {
+                stroke-dashoffset: 0;
+            }
+        }
+
+        .animated-circle {
+            animation: scaleIn 0.5s ease-out forwards;
+            transform-origin: center;
+        }
+
+        @keyframes scaleIn {
+            from {
+                transform: scale(0);
+                opacity: 0;
+            }
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease-out forwards;
+            opacity: 0;
+        }
+
+        @keyframes fadeIn {
+            to {
+                opacity: 1;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            .back-btn, .theme-toggle {
+                position: relative;
+                display: block;
+                margin-bottom: 1rem;
+            }
+
+            .results-grid {
+                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <a href="../index.html" class="back-btn">
+                <i class="fas fa-arrow-left"></i> Volver al Dashboard
+            </a>
+            <button class="theme-toggle" onclick="toggleTheme()">
+                <i class="fas fa-moon"></i>
+            </button>
+            <h1><i class="fas fa-chart-line"></i> Calculadora de Estadística</h1>
+            <p class="subtitle">Análisis estadístico completo con gráficos animados</p>
+        </header>
+
+        <div class="info-box">
+            <h3><i class="fas fa-info-circle"></i> Tipos de Datos</h3>
+            <div class="info-grid">
+                <div class="info-card">
+                    <h4>Datos No Agrupados</h4>
+                    <p>Son datos individuales sin organizar en intervalos. Ejemplo: 12, 15, 18, 20, 22, 25</p>
+                </div>
+                <div class="info-card">
+                    <h4>Datos Agrupados</h4>
+                    <p>Son datos organizados en intervalos de clase con sus frecuencias. Ejemplo: [10-20): 5, [20-30): 8</p>
+                </div>
+                <div class="info-card">
+                    <h4>Formato CSV</h4>
+                    <p>Puede pegar datos desde Excel/CSV separados por comas, espacios o saltos de línea.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="form-group">
+                <label>Tipo de Datos</label>
+                <div class="radio-group">
+                    <div class="radio-option">
+                        <input type="radio" id="ungrouped" name="dataType" value="ungrouped" checked onchange="toggleDataType()">
+                        <label for="ungrouped" style="margin: 0; color: var(--text-color);">Datos No Agrupados</label>
+                    </div>
+                    <div class="radio-option">
+                        <input type="radio" id="grouped" name="dataType" value="grouped" onchange="toggleDataType()">
+                        <label for="grouped" style="margin: 0; color: var(--text-color);">Datos Agrupados</label>
+                    </div>
+                </div>
+            </div>
+
+            <div id="ungroupedInput">
+                <div class="form-group">
+                    <label>Ingrese los Datos (separados por comas, espacios o líneas)</label>
+                    <textarea id="dataInput" placeholder="Ejemplo: 12, 15, 18, 20, 22, 25, 28, 30
+O puede pegar desde Excel/CSV"></textarea>
+                </div>
+            </div>
+
+            <div id="groupedInput" style="display: none;">
+                <div class="form-group">
+                    <label>Ingrese los Datos Agrupados (formato: LímiteInferior-LímiteSuperior:Frecuencia)</label>
+                    <textarea id="groupedDataInput" placeholder="Ejemplo:
+10-20:5
+20-30:8
+30-40:12
+40-50:7
+50-60:3"></textarea>
+                </div>
+            </div>
+
+            <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                <button class="btn" onclick="calculateStatistics()">
+                    <i class="fas fa-calculator"></i> Calcular Estadísticas
+                </button>
+                <button class="btn btn-secondary" onclick="clearData()">
+                    <i class="fas fa-trash"></i> Limpiar
+                </button>
+                <button class="btn btn-secondary" onclick="loadExample()">
+                    <i class="fas fa-file-import"></i> Cargar Ejemplo
+                </button>
+            </div>
+        </div>
+
+        <div class="results" id="results">
+            <h2 style="color: var(--primary-color); margin-bottom: 2rem;">
+                <i class="fas fa-chart-bar"></i> Resultados del Análisis
+            </h2>
+
+            <div class="card">
+                <h3 style="color: var(--primary-color); margin-bottom: 1.5rem;">Medidas de Tendencia Central</h3>
+                <div class="results-grid">
+                    <div class="stat-card">
+                        <div class="stat-label">Media (μ)</div>
+                        <div class="stat-value" id="mean">-</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Mediana</div>
+                        <div class="stat-value" id="median">-</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Moda</div>
+                        <div class="stat-value" id="mode">-</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3 style="color: var(--primary-color); margin-bottom: 1.5rem;">Medidas de Dispersión</h3>
+                <div class="results-grid">
+                    <div class="stat-card">
+                        <div class="stat-label">Rango</div>
+                        <div class="stat-value" id="range">-</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Varianza (σ²)</div>
+                        <div class="stat-value" id="variance">-</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Desviación Estándar (σ)</div>
+                        <div class="stat-value" id="stdDev">-</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Coef. de Variación</div>
+                        <div class="stat-value" id="cv">-<span class="stat-unit">%</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3 style="color: var(--primary-color); margin-bottom: 1.5rem;">Medidas de Posición</h3>
+                <div class="results-grid">
+                    <div class="stat-card">
+                        <div class="stat-label">Cuartil 1 (Q1)</div>
+                        <div class="stat-value" id="q1">-</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Cuartil 2 (Q2)</div>
+                        <div class="stat-value" id="q2">-</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Cuartil 3 (Q3)</div>
+                        <div class="stat-value" id="q3">-</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Rango Intercuartil</div>
+                        <div class="stat-value" id="iqr">-</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3 style="color: var(--primary-color); margin-bottom: 1.5rem;">Medidas de Forma</h3>
+                <div class="results-grid">
+                    <div class="stat-card">
+                        <div class="stat-label">Asimetría (Skewness)</div>
+                        <div class="stat-value" id="skewness">-</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Curtosis</div>
+                        <div class="stat-value" id="kurtosis">-</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Tamaño de Muestra (n)</div>
+                        <div class="stat-value" id="sampleSize">-</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="chart-container">
+                <div class="chart-title"><i class="fas fa-chart-area"></i> Histograma y Curva Normal</div>
+                <svg id="statisticsChart" viewBox="0 0 800 400"></svg>
+            </div>
+
+            <div class="chart-container">
+                <div class="chart-title"><i class="fas fa-box"></i> Diagrama de Caja (Box Plot)</div>
+                <svg id="boxPlot" viewBox="0 0 800 300"></svg>
+            </div>
+
+            <div class="interpretation" id="interpretation">
+                <h3><i class="fas fa-lightbulb"></i> Interpretación de Resultados</h3>
+                <ul id="interpretationList"></ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Theme Toggle
+        function toggleTheme() {
+            const html = document.documentElement;
+            const currentTheme = html.getAttribute('data-theme');
+            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+            html.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+
+            const icon = document.querySelector('.theme-toggle i');
+            icon.className = newTheme === 'light' ? 'fas fa-moon' : 'fas fa-sun';
+
+            // Redraw charts with new theme
+            if (document.getElementById('results').classList.contains('show')) {
+                const data = window.currentData;
+                if (data) {
+                    drawHistogram(data);
+                    drawBoxPlot(data);
+                }
+            }
+        }
+
+        // Load theme on page load
+        window.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme') || 'dark';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+            const icon = document.querySelector('.theme-toggle i');
+            icon.className = savedTheme === 'light' ? 'fas fa-moon' : 'fas fa-sun';
+        });
+
+        function toggleDataType() {
+            const type = document.querySelector('input[name="dataType"]:checked').value;
+            const ungroupedInput = document.getElementById('ungroupedInput');
+            const groupedInput = document.getElementById('groupedInput');
+
+            if (type === 'ungrouped') {
+                ungroupedInput.style.display = 'block';
+                groupedInput.style.display = 'none';
+            } else {
+                ungroupedInput.style.display = 'none';
+                groupedInput.style.display = 'block';
+            }
+        }
+
+        function loadExample() {
+            const type = document.querySelector('input[name="dataType"]:checked').value;
+            if (type === 'ungrouped') {
+                document.getElementById('dataInput').value = '12, 15, 18, 20, 22, 25, 28, 30, 32, 35, 38, 40, 42, 45, 48, 50, 52, 55, 58, 60';
+            } else {
+                document.getElementById('groupedDataInput').value = '10-20:5\n20-30:8\n30-40:12\n40-50:15\n50-60:7\n60-70:3';
+            }
+        }
+
+        function clearData() {
+            document.getElementById('dataInput').value = '';
+            document.getElementById('groupedDataInput').value = '';
+            document.getElementById('results').classList.remove('show');
+        }
+
+        function parseData() {
+            const type = document.querySelector('input[name="dataType"]:checked').value;
+            let data = [];
+
+            if (type === 'ungrouped') {
+                const input = document.getElementById('dataInput').value;
+                // Parse comma, space, or newline separated values
+                const values = input.split(/[\s,\n]+/).filter(v => v.trim() !== '');
+                data = values.map(v => parseFloat(v.trim())).filter(v => !isNaN(v));
+            } else {
+                const input = document.getElementById('groupedDataInput').value;
+                const lines = input.split('\n').filter(l => l.trim() !== '');
+                const grouped = [];
+
+                for (let line of lines) {
+                    const match = line.match(/(\d+\.?\d*)-(\d+\.?\d*):(\d+)/);
+                    if (match) {
+                        const lower = parseFloat(match[1]);
+                        const upper = parseFloat(match[2]);
+                        const freq = parseInt(match[3]);
+                        const midpoint = (lower + upper) / 2;
+
+                        // Expand grouped data to individual values (using midpoints)
+                        for (let i = 0; i < freq; i++) {
+                            data.push(midpoint);
+                        }
+
+                        grouped.push({ lower, upper, freq, midpoint });
+                    }
+                }
+
+                // Store grouped info for histogram
+                data.groupedInfo = grouped;
+            }
+
+            return data;
+        }
+
+        function calculateStatistics() {
+            const data = parseData();
+
+            if (data.length === 0) {
+                alert('Por favor, ingrese datos válidos');
+                return;
+            }
+
+            // Store data for chart redrawing
+            window.currentData = data;
+
+            const sorted = [...data].sort((a, b) => a - b);
+            const n = data.length;
+
+            // Tendencia Central
+            const mean = data.reduce((a, b) => a + b, 0) / n;
+            const median = n % 2 === 0 ? (sorted[n/2 - 1] + sorted[n/2]) / 2 : sorted[Math.floor(n/2)];
+            const mode = calculateMode(data);
+
+            // Dispersión
+            const range = Math.max(...data) - Math.min(...data);
+            const variance = data.reduce((sum, val) => sum + Math.pow(val - mean, 2), 0) / n;
+            const stdDev = Math.sqrt(variance);
+            const cv = (stdDev / mean) * 100;
+
+            // Posición
+            const q1 = calculatePercentile(sorted, 25);
+            const q2 = median;
+            const q3 = calculatePercentile(sorted, 75);
+            const iqr = q3 - q1;
+
+            // Forma
+            const skewness = calculateSkewness(data, mean, stdDev, n);
+            const kurtosis = calculateKurtosis(data, mean, stdDev, n);
+
+            // Display results
+            document.getElementById('mean').textContent = mean.toFixed(2);
+            document.getElementById('median').textContent = median.toFixed(2);
+            document.getElementById('mode').textContent = mode;
+            document.getElementById('range').textContent = range.toFixed(2);
+            document.getElementById('variance').textContent = variance.toFixed(2);
+            document.getElementById('stdDev').textContent = stdDev.toFixed(2);
+            document.getElementById('cv').textContent = cv.toFixed(2);
+            document.getElementById('q1').textContent = q1.toFixed(2);
+            document.getElementById('q2').textContent = q2.toFixed(2);
+            document.getElementById('q3').textContent = q3.toFixed(2);
+            document.getElementById('iqr').textContent = iqr.toFixed(2);
+            document.getElementById('skewness').textContent = skewness.toFixed(3);
+            document.getElementById('kurtosis').textContent = kurtosis.toFixed(3);
+            document.getElementById('sampleSize').textContent = n;
+
+            // Draw charts
+            drawHistogram(data);
+            drawBoxPlot(data);
+
+            // Generate interpretation
+            generateInterpretation({ mean, median, mode, stdDev, cv, skewness, kurtosis, n });
+
+            // Show results
+            document.getElementById('results').classList.add('show');
+            document.getElementById('results').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function calculateMode(data) {
+            const frequency = {};
+            let maxFreq = 0;
+            let modes = [];
+
+            data.forEach(val => {
+                frequency[val] = (frequency[val] || 0) + 1;
+                if (frequency[val] > maxFreq) {
+                    maxFreq = frequency[val];
+                }
+            });
+
+            for (let val in frequency) {
+                if (frequency[val] === maxFreq) {
+                    modes.push(parseFloat(val));
+                }
+            }
+
+            if (modes.length === data.length) return 'No hay moda';
+            if (modes.length > 3) return 'Multimodal';
+            return modes.map(m => m.toFixed(2)).join(', ');
+        }
+
+        function calculatePercentile(sorted, p) {
+            const index = (p / 100) * (sorted.length - 1);
+            const lower = Math.floor(index);
+            const upper = Math.ceil(index);
+            const weight = index - lower;
+            return sorted[lower] * (1 - weight) + sorted[upper] * weight;
+        }
+
+        function calculateSkewness(data, mean, stdDev, n) {
+            const sum = data.reduce((s, val) => s + Math.pow((val - mean) / stdDev, 3), 0);
+            return (n / ((n - 1) * (n - 2))) * sum;
+        }
+
+        function calculateKurtosis(data, mean, stdDev, n) {
+            const sum = data.reduce((s, val) => s + Math.pow((val - mean) / stdDev, 4), 0);
+            return ((n * (n + 1)) / ((n - 1) * (n - 2) * (n - 3))) * sum - (3 * Math.pow(n - 1, 2)) / ((n - 2) * (n - 3));
+        }
+
+        function getColor(lightColor, darkColor) {
+            const theme = document.documentElement.getAttribute('data-theme');
+            return theme === 'light' ? lightColor : darkColor;
+        }
+
+        function drawHistogram(data) {
+            const svg = document.getElementById('statisticsChart');
+            svg.innerHTML = '';
+
+            const width = 800;
+            const height = 400;
+            const margin = { top: 40, right: 40, bottom: 60, left: 60 };
+            const chartWidth = width - margin.left - margin.right;
+            const chartHeight = height - margin.top - margin.bottom;
+
+            const color1 = getColor('#6366f1', '#8b5cf6');
+            const color2 = getColor('#334155', '#e2e8f0');
+            const gridColor = getColor('#e2e8f0', '#334155');
+
+            // Create histogram bins
+            const bins = data.groupedInfo || createBins(data);
+            const isGrouped = !!data.groupedInfo;
+
+            let frequencies, binEdges;
+            if (isGrouped) {
+                frequencies = bins.map(b => b.freq);
+                binEdges = bins.map(b => b.lower);
+                binEdges.push(bins[bins.length - 1].upper);
+            } else {
+                frequencies = bins.map(b => b.length);
+                const min = Math.min(...data);
+                const max = Math.max(...data);
+                const binWidth = (max - min) / bins.length;
+                binEdges = bins.map((_, i) => min + i * binWidth);
+                binEdges.push(max);
+            }
+
+            const maxFreq = Math.max(...frequencies);
+            const minValue = binEdges[0];
+            const maxValue = binEdges[binEdges.length - 1];
+
+            // Scales
+            const xScale = (val) => margin.left + ((val - minValue) / (maxValue - minValue)) * chartWidth;
+            const yScale = (freq) => margin.top + chartHeight - (freq / maxFreq) * chartHeight;
+
+            // Draw grid
+            for (let i = 0; i <= 5; i++) {
+                const y = margin.top + (chartHeight / 5) * i;
+                const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                line.setAttribute('x1', margin.left);
+                line.setAttribute('y1', y);
+                line.setAttribute('x2', margin.left + chartWidth);
+                line.setAttribute('y2', y);
+                line.setAttribute('stroke', gridColor);
+                line.setAttribute('stroke-width', '1');
+                line.setAttribute('opacity', '0.2');
+                svg.appendChild(line);
+            }
+
+            // Draw axes
+            const xAxis = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            xAxis.setAttribute('x1', margin.left);
+            xAxis.setAttribute('y1', margin.top + chartHeight);
+            xAxis.setAttribute('x2', margin.left + chartWidth);
+            xAxis.setAttribute('y2', margin.top + chartHeight);
+            xAxis.setAttribute('stroke', color2);
+            xAxis.setAttribute('stroke-width', '2');
+            svg.appendChild(xAxis);
+
+            const yAxis = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            yAxis.setAttribute('x1', margin.left);
+            yAxis.setAttribute('y1', margin.top);
+            yAxis.setAttribute('x2', margin.left);
+            yAxis.setAttribute('y2', margin.top + chartHeight);
+            yAxis.setAttribute('stroke', color2);
+            yAxis.setAttribute('stroke-width', '2');
+            svg.appendChild(yAxis);
+
+            // Draw bars
+            for (let i = 0; i < frequencies.length; i++) {
+                const x1 = xScale(binEdges[i]);
+                const x2 = xScale(binEdges[i + 1]);
+                const barWidth = x2 - x1;
+                const barHeight = chartHeight - (yScale(frequencies[i]) - margin.top);
+
+                const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+                rect.setAttribute('x', x1);
+                rect.setAttribute('y', yScale(frequencies[i]));
+                rect.setAttribute('width', barWidth - 2);
+                rect.setAttribute('height', barHeight);
+                rect.setAttribute('fill', color1);
+                rect.setAttribute('opacity', '0.7');
+                rect.setAttribute('class', 'animated-bar');
+                rect.style.animationDelay = `${i * 0.1}s`;
+                svg.appendChild(rect);
+
+                // Frequency label on bar
+                const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                text.setAttribute('x', x1 + barWidth / 2);
+                text.setAttribute('y', yScale(frequencies[i]) - 5);
+                text.setAttribute('text-anchor', 'middle');
+                text.setAttribute('fill', color2);
+                text.setAttribute('font-size', '12');
+                text.setAttribute('class', 'fade-in');
+                text.style.animationDelay = `${i * 0.1 + 0.5}s`;
+                text.textContent = frequencies[i];
+                svg.appendChild(text);
+            }
+
+            // Draw normal curve
+            const mean = data.reduce((a, b) => a + b, 0) / data.length;
+            const variance = data.reduce((sum, val) => sum + Math.pow(val - mean, 2), 0) / data.length;
+            const stdDev = Math.sqrt(variance);
+
+            const points = [];
+            const steps = 100;
+            for (let i = 0; i <= steps; i++) {
+                const x = minValue + (maxValue - minValue) * (i / steps);
+                const z = (x - mean) / stdDev;
+                const y = (1 / (stdDev * Math.sqrt(2 * Math.PI))) * Math.exp(-0.5 * z * z);
+                // Scale y to match histogram
+                const scaledY = y * maxFreq * (maxValue - minValue) / bins.length * 2;
+                points.push({ x, y: scaledY });
+            }
+
+            const pathData = points.map((p, i) =>
+                `${i === 0 ? 'M' : 'L'} ${xScale(p.x)} ${yScale(p.y)}`
+            ).join(' ');
+
+            const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+            path.setAttribute('d', pathData);
+            path.setAttribute('fill', 'none');
+            path.setAttribute('stroke', '#ef4444');
+            path.setAttribute('stroke-width', '3');
+            path.setAttribute('class', 'animated-line');
+            svg.appendChild(path);
+
+            // Axis labels
+            const xLabel = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+            xLabel.setAttribute('x', width / 2);
+            xLabel.setAttribute('y', height - 10);
+            xLabel.setAttribute('text-anchor', 'middle');
+            xLabel.setAttribute('fill', color2);
+            xLabel.setAttribute('font-size', '14');
+            xLabel.textContent = 'Valores';
+            svg.appendChild(xLabel);
+
+            const yLabel = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+            yLabel.setAttribute('x', -height / 2);
+            yLabel.setAttribute('y', 20);
+            yLabel.setAttribute('text-anchor', 'middle');
+            yLabel.setAttribute('fill', color2);
+            yLabel.setAttribute('font-size', '14');
+            yLabel.setAttribute('transform', `rotate(-90, 20, ${height / 2})`);
+            yLabel.textContent = 'Frecuencia';
+            svg.appendChild(yLabel);
+
+            // X-axis tick labels
+            for (let i = 0; i <= bins.length; i++) {
+                if (i % Math.ceil(bins.length / 8) === 0 || i === bins.length) {
+                    const x = xScale(binEdges[i]);
+                    const tick = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                    tick.setAttribute('x1', x);
+                    tick.setAttribute('y1', margin.top + chartHeight);
+                    tick.setAttribute('x2', x);
+                    tick.setAttribute('y2', margin.top + chartHeight + 5);
+                    tick.setAttribute('stroke', color2);
+                    tick.setAttribute('stroke-width', '1');
+                    svg.appendChild(tick);
+
+                    const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                    label.setAttribute('x', x);
+                    label.setAttribute('y', margin.top + chartHeight + 20);
+                    label.setAttribute('text-anchor', 'middle');
+                    label.setAttribute('fill', color2);
+                    label.setAttribute('font-size', '11');
+                    label.textContent = binEdges[i].toFixed(1);
+                    svg.appendChild(label);
+                }
+            }
+
+            // Y-axis tick labels
+            for (let i = 0; i <= 5; i++) {
+                const freq = maxFreq * (5 - i) / 5;
+                const y = margin.top + (chartHeight / 5) * i;
+
+                const tick = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                tick.setAttribute('x1', margin.left - 5);
+                tick.setAttribute('y1', y);
+                tick.setAttribute('x2', margin.left);
+                tick.setAttribute('y2', y);
+                tick.setAttribute('stroke', color2);
+                tick.setAttribute('stroke-width', '1');
+                svg.appendChild(tick);
+
+                const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                label.setAttribute('x', margin.left - 10);
+                label.setAttribute('y', y + 4);
+                label.setAttribute('text-anchor', 'end');
+                label.setAttribute('fill', color2);
+                label.setAttribute('font-size', '11');
+                label.textContent = Math.round(freq);
+                svg.appendChild(label);
+            }
+        }
+
+        function createBins(data) {
+            const n = data.length;
+            // Sturges' formula for number of bins
+            const numBins = Math.ceil(Math.log2(n) + 1);
+            const min = Math.min(...data);
+            const max = Math.max(...data);
+            const binWidth = (max - min) / numBins;
+
+            const bins = Array(numBins).fill(null).map(() => []);
+
+            data.forEach(val => {
+                let binIndex = Math.floor((val - min) / binWidth);
+                if (binIndex >= numBins) binIndex = numBins - 1;
+                bins[binIndex].push(val);
+            });
+
+            return bins;
+        }
+
+        function drawBoxPlot(data) {
+            const svg = document.getElementById('boxPlot');
+            svg.innerHTML = '';
+
+            const width = 800;
+            const height = 300;
+            const margin = { top: 40, right: 40, bottom: 60, left: 60 };
+            const chartWidth = width - margin.left - margin.right;
+            const chartHeight = height - margin.top - margin.bottom;
+
+            const color1 = getColor('#6366f1', '#8b5cf6');
+            const color2 = getColor('#334155', '#e2e8f0');
+
+            const sorted = [...data].sort((a, b) => a - b);
+            const min = Math.min(...data);
+            const max = Math.max(...data);
+            const q1 = calculatePercentile(sorted, 25);
+            const median = calculatePercentile(sorted, 50);
+            const q3 = calculatePercentile(sorted, 75);
+            const iqr = q3 - q1;
+
+            // Outliers detection
+            const lowerFence = q1 - 1.5 * iqr;
+            const upperFence = q3 + 1.5 * iqr;
+            const outliers = data.filter(v => v < lowerFence || v > upperFence);
+
+            const xScale = (val) => margin.left + ((val - min) / (max - min)) * chartWidth;
+            const centerY = margin.top + chartHeight / 2;
+            const boxHeight = 80;
+
+            // Draw axis
+            const axis = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            axis.setAttribute('x1', margin.left);
+            axis.setAttribute('y1', centerY + boxHeight);
+            axis.setAttribute('x2', margin.left + chartWidth);
+            axis.setAttribute('y2', centerY + boxHeight);
+            axis.setAttribute('stroke', color2);
+            axis.setAttribute('stroke-width', '2');
+            svg.appendChild(axis);
+
+            // Draw whiskers
+            const whiskerMin = Math.max(min, lowerFence);
+            const whiskerMax = Math.min(max, upperFence);
+
+            // Left whisker
+            const leftWhisker = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            leftWhisker.setAttribute('x1', xScale(whiskerMin));
+            leftWhisker.setAttribute('y1', centerY);
+            leftWhisker.setAttribute('x2', xScale(q1));
+            leftWhisker.setAttribute('y2', centerY);
+            leftWhisker.setAttribute('stroke', color1);
+            leftWhisker.setAttribute('stroke-width', '2');
+            leftWhisker.setAttribute('class', 'animated-line');
+            svg.appendChild(leftWhisker);
+
+            // Right whisker
+            const rightWhisker = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            rightWhisker.setAttribute('x1', xScale(q3));
+            rightWhisker.setAttribute('y1', centerY);
+            rightWhisker.setAttribute('x2', xScale(whiskerMax));
+            rightWhisker.setAttribute('y2', centerY);
+            rightWhisker.setAttribute('stroke', color1);
+            rightWhisker.setAttribute('stroke-width', '2');
+            rightWhisker.setAttribute('class', 'animated-line');
+            svg.appendChild(rightWhisker);
+
+            // Draw box
+            const box = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+            box.setAttribute('x', xScale(q1));
+            box.setAttribute('y', centerY - boxHeight / 2);
+            box.setAttribute('width', xScale(q3) - xScale(q1));
+            box.setAttribute('height', boxHeight);
+            box.setAttribute('fill', color1);
+            box.setAttribute('opacity', '0.3');
+            box.setAttribute('stroke', color1);
+            box.setAttribute('stroke-width', '2');
+            box.setAttribute('class', 'animated-bar');
+            svg.appendChild(box);
+
+            // Draw median line
+            const medianLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            medianLine.setAttribute('x1', xScale(median));
+            medianLine.setAttribute('y1', centerY - boxHeight / 2);
+            medianLine.setAttribute('x2', xScale(median));
+            medianLine.setAttribute('y2', centerY + boxHeight / 2);
+            medianLine.setAttribute('stroke', '#ef4444');
+            medianLine.setAttribute('stroke-width', '3');
+            medianLine.setAttribute('class', 'animated-line');
+            svg.appendChild(medianLine);
+
+            // Draw outliers
+            outliers.forEach((val, i) => {
+                const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                circle.setAttribute('cx', xScale(val));
+                circle.setAttribute('cy', centerY);
+                circle.setAttribute('r', '5');
+                circle.setAttribute('fill', '#ef4444');
+                circle.setAttribute('class', 'animated-circle');
+                circle.style.animationDelay = `${i * 0.1 + 0.5}s`;
+                svg.appendChild(circle);
+            });
+
+            // Labels
+            const labels = [
+                { val: whiskerMin, text: 'Mín' },
+                { val: q1, text: 'Q1' },
+                { val: median, text: 'Mediana' },
+                { val: q3, text: 'Q3' },
+                { val: whiskerMax, text: 'Máx' }
+            ];
+
+            labels.forEach((label, i) => {
+                const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                text.setAttribute('x', xScale(label.val));
+                text.setAttribute('y', centerY + boxHeight / 2 + 25);
+                text.setAttribute('text-anchor', 'middle');
+                text.setAttribute('fill', color2);
+                text.setAttribute('font-size', '12');
+                text.setAttribute('class', 'fade-in');
+                text.style.animationDelay = `${i * 0.1}s`;
+                text.textContent = `${label.text}: ${label.val.toFixed(2)}`;
+                svg.appendChild(text);
+            });
+
+            // Axis tick labels
+            const tickValues = [min, q1, median, q3, max];
+            tickValues.forEach((val, i) => {
+                const x = xScale(val);
+                const tick = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                tick.setAttribute('x1', x);
+                tick.setAttribute('y1', centerY + boxHeight);
+                tick.setAttribute('x2', x);
+                tick.setAttribute('y2', centerY + boxHeight + 5);
+                tick.setAttribute('stroke', color2);
+                tick.setAttribute('stroke-width', '1');
+                svg.appendChild(tick);
+
+                const tickLabel = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                tickLabel.setAttribute('x', x);
+                tickLabel.setAttribute('y', centerY + boxHeight + 20);
+                tickLabel.setAttribute('text-anchor', 'middle');
+                tickLabel.setAttribute('fill', color2);
+                tickLabel.setAttribute('font-size', '11');
+                tickLabel.textContent = val.toFixed(1);
+                svg.appendChild(tickLabel);
+            });
+        }
+
+        function generateInterpretation(stats) {
+            const list = document.getElementById('interpretationList');
+            list.innerHTML = '';
+
+            const interpretations = [];
+
+            // Normalidad basada en asimetría y curtosis
+            if (Math.abs(stats.skewness) < 0.5 && Math.abs(stats.kurtosis) < 1) {
+                interpretations.push('Los datos siguen aproximadamente una <strong>distribución normal</strong> (asimetría y curtosis cercanas a 0).');
+            } else if (Math.abs(stats.skewness) >= 0.5) {
+                if (stats.skewness > 0) {
+                    interpretations.push('Los datos presentan <strong>asimetría positiva</strong> (cola hacia la derecha). La mayoría de los valores están por debajo de la media.');
+                } else {
+                    interpretations.push('Los datos presentan <strong>asimetría negativa</strong> (cola hacia la izquierda). La mayoría de los valores están por encima de la media.');
+                }
+            }
+
+            // Curtosis
+            if (stats.kurtosis > 1) {
+                interpretations.push('La distribución es <strong>leptocúrtica</strong> (pico pronunciado). Los datos están muy concentrados alrededor de la media.');
+            } else if (stats.kurtosis < -1) {
+                interpretations.push('La distribución es <strong>platicúrtica</strong> (pico aplanado). Los datos están dispersos.');
+            }
+
+            // Coeficiente de variación
+            if (stats.cv < 15) {
+                interpretations.push(`El coeficiente de variación es <strong>${stats.cv.toFixed(2)}%</strong>, indicando <strong>baja dispersión</strong> (datos homogéneos).`);
+            } else if (stats.cv < 30) {
+                interpretations.push(`El coeficiente de variación es <strong>${stats.cv.toFixed(2)}%</strong>, indicando <strong>dispersión moderada</strong>.`);
+            } else {
+                interpretations.push(`El coeficiente de variación es <strong>${stats.cv.toFixed(2)}%</strong>, indicando <strong>alta dispersión</strong> (datos heterogéneos).`);
+            }
+
+            // Comparación media-mediana
+            const diff = Math.abs(stats.mean - stats.median);
+            const diffPercent = (diff / stats.mean) * 100;
+            if (diffPercent < 5) {
+                interpretations.push('La media y la mediana son muy similares, confirmando una distribución simétrica.');
+            }
+
+            // Tamaño de muestra
+            if (stats.n < 30) {
+                interpretations.push(`Tamaño de muestra pequeño (n=${stats.n}). Los resultados pueden no ser representativos de la población.`);
+            } else if (stats.n >= 30) {
+                interpretations.push(`Tamaño de muestra adecuado (n=${stats.n}) para inferencias estadísticas.`);
+            }
+
+            interpretations.forEach(text => {
+                const li = document.createElement('li');
+                li.innerHTML = text;
+                list.appendChild(li);
+            });
+        }
+    </script>
+</body>
+</html>
