@@ -751,3 +751,111 @@ document.addEventListener('keydown', (e) => {
 console.log('%c⌨️  Atajos de teclado:', 'color: #00d4ff; font-weight: bold;');
 console.log('%cCtrl + K: Cambiar tema', 'color: #9ca3af;');
 console.log('%cCtrl + ↑: Ir arriba', 'color: #9ca3af;');
+
+// ========================================================
+// ANIMATED COUNTER
+// ========================================================
+function animateCounter(element) {
+    const target = parseInt(element.getAttribute('data-target'));
+    const duration = 2000; // 2 seconds
+    const increment = target / (duration / 16); // 60 FPS
+    let current = 0;
+
+    const updateCounter = () => {
+        current += increment;
+        if (current < target) {
+            element.textContent = Math.floor(current);
+            requestAnimationFrame(updateCounter);
+        } else {
+            element.textContent = target;
+        }
+    };
+
+    updateCounter();
+}
+
+// Intersection Observer for counters
+const counterObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting && !entry.target.classList.contains('animated')) {
+            entry.target.classList.add('animated');
+            animateCounter(entry.target);
+        }
+    });
+}, {
+    threshold: 0.5
+});
+
+// Observe all stat numbers
+document.querySelectorAll('.stat-number').forEach(counter => {
+    counterObserver.observe(counter);
+});
+
+// ========================================================
+// CONTACT FORM
+// ========================================================
+const contactForm = document.getElementById('contactForm');
+const formStatus = document.getElementById('formStatus');
+
+if (contactForm) {
+    contactForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const submitBtn = contactForm.querySelector('.submit-btn');
+        const originalBtnText = submitBtn.innerHTML;
+
+        // Disable button and show loading
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Enviando...';
+
+        // Hide previous status
+        formStatus.className = 'form-status';
+        formStatus.style.display = 'none';
+
+        // Get form data
+        const formData = new FormData(contactForm);
+        const data = {
+            name: formData.get('name'),
+            email: formData.get('email'),
+            subject: formData.get('subject'),
+            message: formData.get('message')
+        };
+
+        try {
+            // Using FormSubmit.co - Free service, no registration needed
+            // The form will send to your email: 73584265@est.unap.edu.pe
+            const response = await fetch('https://formsubmit.co/ajax/73584265@est.unap.edu.pe', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify(data)
+            });
+
+            if (response.ok) {
+                // Success
+                formStatus.className = 'form-status success';
+                formStatus.textContent = '✓ ¡Mensaje enviado con éxito! Te responderé pronto.';
+                formStatus.style.display = 'block';
+                contactForm.reset();
+
+                // Hide success message after 5 seconds
+                setTimeout(() => {
+                    formStatus.style.display = 'none';
+                }, 5000);
+            } else {
+                throw new Error('Error al enviar el mensaje');
+            }
+        } catch (error) {
+            // Error
+            formStatus.className = 'form-status error';
+            formStatus.textContent = '✗ Hubo un error al enviar el mensaje. Por favor, intenta nuevamente o escríbeme directamente a 73584265@est.unap.edu.pe';
+            formStatus.style.display = 'block';
+        } finally {
+            // Re-enable button
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = originalBtnText;
+        }
+    });
+}
