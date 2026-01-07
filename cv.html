@@ -749,61 +749,335 @@
             icon.className = savedTheme === 'light' ? 'fas fa-moon' : 'fas fa-sun';
         });
 
-        // Download PDF function
+        // Download PDF function - Formal professional format
         async function downloadPDF() {
             const overlay = document.getElementById('loadingOverlay');
             overlay.classList.add('active');
 
             try {
                 const { jsPDF } = window.jspdf;
-                const cvContent = document.getElementById('cv-content');
-
-                // Temporarily set light theme for PDF
-                const originalTheme = document.documentElement.getAttribute('data-theme');
-                document.documentElement.setAttribute('data-theme', 'light');
-
-                // Wait for theme to apply
-                await new Promise(resolve => setTimeout(resolve, 100));
-
-                // Capture the content as canvas
-                const canvas = await html2canvas(cvContent, {
-                    scale: 2,
-                    useCORS: true,
-                    logging: false,
-                    backgroundColor: '#ffffff'
-                });
-
-                // Restore original theme
-                document.documentElement.setAttribute('data-theme', originalTheme);
-
-                const imgData = canvas.toDataURL('image/png');
                 const pdf = new jsPDF({
                     orientation: 'portrait',
                     unit: 'mm',
                     format: 'a4'
                 });
 
-                const pdfWidth = pdf.internal.pageSize.getWidth();
-                const pdfHeight = pdf.internal.pageSize.getHeight();
-                const imgWidth = canvas.width;
-                const imgHeight = canvas.height;
-                const ratio = Math.min(pdfWidth / imgWidth, pdfHeight / imgHeight);
-                const imgX = 0;
-                const imgY = 0;
+                const pageWidth = pdf.internal.pageSize.getWidth();
+                const pageHeight = pdf.internal.pageSize.getHeight();
+                const margin = 20;
+                const contentWidth = pageWidth - (margin * 2);
+                let yPos = margin;
 
-                // Calculate how many pages are needed
-                const pageHeight = imgHeight * ratio;
-                let heightLeft = pageHeight;
-                let position = 0;
+                // Helper function to check if new page is needed
+                function checkNewPage(heightNeeded) {
+                    if (yPos + heightNeeded > pageHeight - margin) {
+                        pdf.addPage();
+                        yPos = margin;
+                        return true;
+                    }
+                    return false;
+                }
 
-                pdf.addImage(imgData, 'PNG', imgX, imgY, pdfWidth, pageHeight);
-                heightLeft -= pdfHeight;
+                // Header Section
+                pdf.setFillColor(40, 40, 80);
+                pdf.rect(0, 0, pageWidth, 55, 'F');
 
-                while (heightLeft > 0) {
-                    position = heightLeft - pageHeight;
-                    pdf.addPage();
-                    pdf.addImage(imgData, 'PNG', imgX, position, pdfWidth, pageHeight);
-                    heightLeft -= pdfHeight;
+                // Add profile photo (circular)
+                try {
+                    const photoUrl = 'https://avatars.githubusercontent.com/SmitSuni';
+                    const img = new Image();
+                    img.crossOrigin = 'Anonymous';
+
+                    await new Promise((resolve, reject) => {
+                        img.onload = () => {
+                            // Create canvas to make circular image
+                            const canvas = document.createElement('canvas');
+                            const size = 200;
+                            canvas.width = size;
+                            canvas.height = size;
+                            const ctx = canvas.getContext('2d');
+
+                            // Draw circular clip
+                            ctx.beginPath();
+                            ctx.arc(size/2, size/2, size/2, 0, Math.PI * 2);
+                            ctx.closePath();
+                            ctx.clip();
+
+                            // Draw image
+                            ctx.drawImage(img, 0, 0, size, size);
+
+                            // Add to PDF
+                            const imgData = canvas.toDataURL('image/png');
+                            pdf.addImage(imgData, 'PNG', pageWidth - 35, 10, 25, 25);
+                            resolve();
+                        };
+                        img.onerror = () => resolve(); // Continue even if image fails
+                        img.src = photoUrl;
+                    });
+                } catch (error) {
+                    console.log('Photo not added:', error);
+                }
+
+                pdf.setTextColor(255, 255, 255);
+                pdf.setFontSize(24);
+                pdf.setFont('helvetica', 'bold');
+                pdf.text('SMIT ALEXANDER SUNI MORALES', pageWidth / 2, 18, { align: 'center' });
+
+                pdf.setFontSize(11);
+                pdf.setFont('helvetica', 'normal');
+                pdf.text('Ingeniería Estadística e Informática', pageWidth / 2, 28, { align: 'center' });
+
+                pdf.setFontSize(9);
+                pdf.text('Universidad Nacional del Altiplano | Puno, Perú', pageWidth / 2, 38, { align: 'center' });
+                pdf.text('73584265@est.unap.edu.pe | github.com/SmitSuni', pageWidth / 2, 46, { align: 'center' });
+
+                yPos = 65;
+
+                // Section: Perfil Profesional
+                pdf.setTextColor(40, 40, 80);
+                pdf.setFontSize(14);
+                pdf.setFont('helvetica', 'bold');
+                pdf.text('PERFIL PROFESIONAL', margin, yPos);
+
+                pdf.setDrawColor(40, 40, 80);
+                pdf.setLineWidth(0.5);
+                pdf.line(margin, yPos + 2, pageWidth - margin, yPos + 2);
+                yPos += 8;
+
+                pdf.setTextColor(60, 60, 60);
+                pdf.setFontSize(10);
+                pdf.setFont('helvetica', 'normal');
+
+                const profile1 = 'Estudiante de Ingeniería Estadística e Informática de la Universidad Nacional del Altiplano, con formación académica orientada al área de programación, bases de datos y estadística. A lo largo de mi formación universitaria he desarrollado diversos proyectos académicos que me han permitido adquirir experiencia práctica en el diseño, implementación y gestión de sistemas informáticos, aplicando correctamente conceptos de programación estructurada y orientada a objetos.';
+
+                const profile2 = 'Poseo conocimientos en el desarrollo de aplicaciones de escritorio con interfaz gráfica, utilizando lenguajes como Python, Java y C++, así como el manejo de entornos de desarrollo como Apache NetBeans y la implementación de interfaces gráficas mediante Tkinter y WinAPI. En el área de bases de datos, cuento con experiencia en el diseño y administración de bases de datos relacionales, principalmente en MariaDB, realizando modelado de datos, creación de tablas y consultas SQL.';
+
+                const profile3 = 'Adicionalmente, poseo formación en estadística descriptiva e inferencial, análisis de datos y modelos estadísticos, aplicando estos conocimientos en proyectos de investigación. He trabajado con modelos como regresión lineal, regresión de Poisson y regresión binomial negativa.';
+
+                const profileLines1 = pdf.splitTextToSize(profile1, contentWidth);
+                pdf.text(profileLines1, margin, yPos);
+                yPos += profileLines1.length * 5 + 3;
+
+                const profileLines2 = pdf.splitTextToSize(profile2, contentWidth);
+                pdf.text(profileLines2, margin, yPos);
+                yPos += profileLines2.length * 5 + 3;
+
+                const profileLines3 = pdf.splitTextToSize(profile3, contentWidth);
+                pdf.text(profileLines3, margin, yPos);
+                yPos += profileLines3.length * 5 + 8;
+
+                // Section: Educación
+                checkNewPage(30);
+                pdf.setTextColor(40, 40, 80);
+                pdf.setFontSize(14);
+                pdf.setFont('helvetica', 'bold');
+                pdf.text('EDUCACIÓN', margin, yPos);
+                pdf.line(margin, yPos + 2, pageWidth - margin, yPos + 2);
+                yPos += 8;
+
+                pdf.setFontSize(11);
+                pdf.setFont('helvetica', 'bold');
+                pdf.setTextColor(60, 60, 60);
+                pdf.text('Universidad Nacional del Altiplano', margin, yPos);
+
+                pdf.setFont('helvetica', 'normal');
+                pdf.setFontSize(10);
+                pdf.setTextColor(100, 100, 100);
+                pdf.text('2020 - Actualidad', pageWidth - margin, yPos, { align: 'right' });
+                yPos += 6;
+
+                pdf.setTextColor(60, 60, 60);
+                pdf.setFont('helvetica', 'italic');
+                pdf.text('Ingeniería Estadística e Informática | Promedio Ponderado: >15/20', margin, yPos);
+                yPos += 5;
+
+                pdf.setFont('helvetica', 'normal');
+                pdf.setFontSize(9);
+                const eduDesc = 'Formación académica orientada al desarrollo de software, bases de datos, estadística aplicada y sistemas de información. Destacado rendimiento académico con promedio ponderado superior a 15 sobre 20.';
+                const eduLines = pdf.splitTextToSize(eduDesc, contentWidth);
+                pdf.text(eduLines, margin, yPos);
+                yPos += eduLines.length * 4.5 + 8;
+
+                // Section: Habilidades Técnicas
+                checkNewPage(80);
+                pdf.setTextColor(40, 40, 80);
+                pdf.setFontSize(14);
+                pdf.setFont('helvetica', 'bold');
+                pdf.text('HABILIDADES TÉCNICAS', margin, yPos);
+                pdf.line(margin, yPos + 2, pageWidth - margin, yPos + 2);
+                yPos += 8;
+
+                const skills = [
+                    {
+                        title: 'Lenguajes de Programación',
+                        items: ['Python (Tkinter, NumPy, Pandas, Matplotlib)', 'Java (POO, Swing, JavaFX)', 'C++ (WinAPI, STL)', 'JavaScript, HTML5, CSS3']
+                    },
+                    {
+                        title: 'Bases de Datos',
+                        items: ['MariaDB / MySQL', 'SQL Avanzado', 'Modelado y Normalización de Datos']
+                    },
+                    {
+                        title: 'Estadística y Análisis',
+                        items: ['Estadística Descriptiva e Inferencial', 'Regresión Lineal, Poisson y Binomial Negativa', 'Análisis de Datos']
+                    },
+                    {
+                        title: 'Herramientas',
+                        items: ['Apache NetBeans IDE', 'Visual Studio Code', 'Git & GitHub', 'GitHub Pages']
+                    }
+                ];
+
+                pdf.setFontSize(10);
+                skills.forEach(category => {
+                    checkNewPage(20);
+                    pdf.setFont('helvetica', 'bold');
+                    pdf.setTextColor(60, 60, 60);
+                    pdf.text('• ' + category.title, margin + 5, yPos);
+                    yPos += 5;
+
+                    pdf.setFont('helvetica', 'normal');
+                    pdf.setFontSize(9);
+                    pdf.setTextColor(80, 80, 80);
+                    category.items.forEach(item => {
+                        pdf.text('  - ' + item, margin + 10, yPos);
+                        yPos += 4;
+                    });
+                    yPos += 2;
+                    pdf.setFontSize(10);
+                });
+
+                yPos += 3;
+
+                // Section: Proyectos Destacados
+                checkNewPage(40);
+                pdf.setTextColor(40, 40, 80);
+                pdf.setFontSize(14);
+                pdf.setFont('helvetica', 'bold');
+                pdf.text('PROYECTOS DESTACADOS', margin, yPos);
+                pdf.line(margin, yPos + 2, pageWidth - margin, yPos + 2);
+                yPos += 8;
+
+                const projects = [
+                    {
+                        title: 'Dashboard Personal con Herramientas de Ingeniería',
+                        year: '2024',
+                        desc: 'Desarrollo de dashboard web con herramientas de ingeniería: conversor de unidades, calculadora de resistencia de materiales según RNE, diseño de escaleras y análisis estadístico completo con visualizaciones SVG animadas.',
+                        tech: 'HTML5, CSS3, JavaScript, SVG Animations'
+                    },
+                    {
+                        title: 'Sistema de Estadística con Interfaz Gráfica',
+                        year: '2024',
+                        desc: 'Aplicación en Python que calcula medidas estadísticas descriptivas e inferenciales, genera gráficos (histogramas, curvas normales, box plots) para datos agrupados y no agrupados.',
+                        tech: 'Python, Tkinter, NumPy, Matplotlib'
+                    },
+                    {
+                        title: 'Sistema de Biblioteca Universitaria',
+                        year: '2024',
+                        desc: 'Sistema de gestión para bibliotecas que permite registrar usuarios, gestionar reservas, control de préstamos y generación de reportes con MariaDB.',
+                        tech: 'Python, Tkinter, MariaDB, SQL'
+                    },
+                    {
+                        title: 'Aplicación de Métodos Numéricos en C++',
+                        year: '2023-2024',
+                        desc: 'Herramienta con WinAPI que implementa métodos numéricos para resolución de ecuaciones y graficación de funciones matemáticas.',
+                        tech: 'C++, WinAPI'
+                    }
+                ];
+
+                pdf.setFontSize(10);
+                projects.forEach((project, index) => {
+                    checkNewPage(25);
+
+                    pdf.setFont('helvetica', 'bold');
+                    pdf.setTextColor(60, 60, 60);
+                    pdf.text(project.title, margin, yPos);
+
+                    pdf.setFont('helvetica', 'normal');
+                    pdf.setTextColor(100, 100, 100);
+                    pdf.text(project.year, pageWidth - margin, yPos, { align: 'right' });
+                    yPos += 5;
+
+                    pdf.setFontSize(9);
+                    pdf.setTextColor(80, 80, 80);
+                    const descLines = pdf.splitTextToSize(project.desc, contentWidth - 5);
+                    pdf.text(descLines, margin + 2, yPos);
+                    yPos += descLines.length * 4 + 2;
+
+                    pdf.setFont('helvetica', 'italic');
+                    pdf.setTextColor(100, 100, 100);
+                    pdf.text('Tecnologías: ' + project.tech, margin + 2, yPos);
+                    yPos += 6;
+
+                    pdf.setFontSize(10);
+                });
+
+                // Section: Competencias Personales
+                checkNewPage(30);
+                pdf.setTextColor(40, 40, 80);
+                pdf.setFontSize(14);
+                pdf.setFont('helvetica', 'bold');
+                pdf.text('COMPETENCIAS PERSONALES', margin, yPos);
+                pdf.line(margin, yPos + 2, pageWidth - margin, yPos + 2);
+                yPos += 8;
+
+                pdf.setFontSize(10);
+                pdf.setFont('helvetica', 'normal');
+                pdf.setTextColor(80, 80, 80);
+                const competencias = [
+                    'Responsabilidad y compromiso',
+                    'Capacidad analítica',
+                    'Organización y planificación',
+                    'Aprendizaje continuo',
+                    'Adaptabilidad',
+                    'Trabajo en equipo'
+                ];
+
+                const colWidth = contentWidth / 2;
+                competencias.forEach((comp, index) => {
+                    const xPos = index % 2 === 0 ? margin + 5 : margin + colWidth + 5;
+                    if (index % 2 === 0 && index > 0) yPos += 5;
+                    pdf.text('• ' + comp, xPos, yPos);
+                });
+                yPos += 10;
+
+                // Section: Idiomas
+                checkNewPage(20);
+                pdf.setTextColor(40, 40, 80);
+                pdf.setFontSize(14);
+                pdf.setFont('helvetica', 'bold');
+                pdf.text('IDIOMAS', margin, yPos);
+                pdf.line(margin, yPos + 2, pageWidth - margin, yPos + 2);
+                yPos += 8;
+
+                pdf.setFontSize(10);
+                pdf.setFont('helvetica', 'normal');
+                pdf.setTextColor(80, 80, 80);
+                pdf.text('• Español - Nativo', margin + 5, yPos);
+                yPos += 10;
+
+                // Section: Objetivo Profesional
+                checkNewPage(30);
+                pdf.setTextColor(40, 40, 80);
+                pdf.setFontSize(14);
+                pdf.setFont('helvetica', 'bold');
+                pdf.text('OBJETIVO PROFESIONAL', margin, yPos);
+                pdf.line(margin, yPos + 2, pageWidth - margin, yPos + 2);
+                yPos += 8;
+
+                pdf.setFontSize(9);
+                pdf.setFont('helvetica', 'normal');
+                pdf.setTextColor(60, 60, 60);
+                const objetivo = 'Mi interés principal al realizar mis prácticas pre-profesionales es aplicar de manera práctica los conocimientos adquiridos durante mi formación académica, fortalecer mis competencias técnicas en programación y bases de datos, y contribuir de forma eficiente y responsable al desarrollo de las actividades asignadas dentro de la institución o empresa. Busco integrarme a un equipo de trabajo donde pueda aportar mis habilidades en desarrollo de software, análisis de datos y gestión de bases de datos, mientras continúo aprendiendo y desarrollándome profesionalmente.';
+                const objLines = pdf.splitTextToSize(objetivo, contentWidth);
+                pdf.text(objLines, margin, yPos);
+
+                // Footer on each page
+                const totalPages = pdf.internal.getNumberOfPages();
+                for (let i = 1; i <= totalPages; i++) {
+                    pdf.setPage(i);
+                    pdf.setFontSize(8);
+                    pdf.setTextColor(150, 150, 150);
+                    pdf.setFont('helvetica', 'italic');
+                    pdf.text('Portfolio: smitsuni.github.io/Dashboard', pageWidth / 2, pageHeight - 10, { align: 'center' });
                 }
 
                 pdf.save('CV_SmitAlexanderSuniMorales.pdf');
