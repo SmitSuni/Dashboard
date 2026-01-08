@@ -85,8 +85,10 @@
         .result-unit { font-size: 1rem; color: var(--text-muted); margin-left: 0.3rem; }
 
         .info-box { background: var(--bg-secondary); border-left: 4px solid var(--accent-cyan); padding: 1.2rem; border-radius: 8px; margin-bottom: 1.5rem; }
-        .info-box-title { font-weight: 600; color: var(--accent-cyan); margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem; }
+        .info-box-title { font-weight: 600; color: var(--accent-cyan); margin-bottom: 0.5rem; display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; }
         .info-box-text { color: var(--text-secondary); font-size: 0.95rem; line-height: 1.6; }
+        .help-btn { padding: 0.5rem 1rem; background: var(--accent-purple); color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 0.9rem; transition: all 0.3s ease; display: flex; align-items: center; gap: 0.5rem; }
+        .help-btn:hover { background: var(--accent-blue); transform: translateY(-2px); box-shadow: 0 4px 8px rgba(99,102,241,0.3); }
         .norm-badge { display: inline-block; background: var(--accent-purple); color: white; padding: 0.3rem 0.8rem; border-radius: 15px; font-size: 0.8rem; font-weight: 600; margin-left: 0.5rem; }
         .formula-box { background: var(--bg-tertiary); padding: 1rem; border-radius: 8px; border: 1px solid var(--accent-purple); margin: 1rem 0; text-align: center; }
         .formula { font-size: 1.2rem; font-weight: 600; color: var(--accent-purple); font-family: 'Courier New', monospace; margin: 0.5rem 0; }
@@ -107,6 +109,29 @@
         @keyframes drawLine { to { stroke-dashoffset: 0; } }
         .fade-in-text { animation: fadeInText 0.5s ease-out 0.5s forwards; opacity: 0; }
         @keyframes fadeInText { to { opacity: 1; } }
+
+        /* Help Modal */
+        .modal { display: none; position: fixed; z-index: 9999; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); }
+        .modal.show { display: flex; align-items: center; justify-content: center; }
+        .modal-content { background: var(--bg-secondary); width: 90%; max-width: 800px; max-height: 90vh; border-radius: 12px; overflow: hidden; position: relative; animation: modalSlideIn 0.3s ease-out; }
+        @keyframes modalSlideIn { from { transform: translateY(-50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        .modal-header { background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple)); color: white; padding: 1.5rem 2rem; display: flex; justify-content: space-between; align-items: center; }
+        .modal-title { font-size: 1.5rem; font-weight: 700; display: flex; align-items: center; gap: 0.75rem; }
+        .modal-close { background: none; border: none; color: white; font-size: 2rem; cursor: pointer; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border-radius: 50%; transition: background 0.3s ease; }
+        .modal-close:hover { background: rgba(255,255,255,0.2); }
+        .modal-body { padding: 2rem; overflow-y: auto; max-height: calc(90vh - 100px); }
+        .help-section { margin-bottom: 2rem; }
+        .help-section-title { font-size: 1.2rem; color: var(--accent-cyan); margin-bottom: 1rem; font-weight: 600; display: flex; align-items: center; gap: 0.5rem; }
+        .help-content { color: var(--text-secondary); line-height: 1.8; margin-bottom: 1rem; }
+        .help-list { list-style: none; padding-left: 0; }
+        .help-list li { padding: 0.5rem 0; padding-left: 1.5rem; position: relative; }
+        .help-list li::before { content: "▸"; position: absolute; left: 0; color: var(--accent-cyan); font-weight: bold; }
+        .example-box { background: var(--bg-tertiary); border: 2px solid var(--accent-purple); border-radius: 8px; padding: 1.5rem; margin: 1rem 0; }
+        .example-title { font-weight: 600; color: var(--accent-purple); margin-bottom: 0.75rem; font-size: 1.1rem; }
+        .example-data { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 0.75rem; margin-top: 0.75rem; }
+        .example-item { background: var(--bg-secondary); padding: 0.75rem; border-radius: 6px; }
+        .example-label { font-size: 0.85rem; color: var(--text-muted); }
+        .example-value { font-weight: 600; color: var(--accent-green); font-size: 1.1rem; }
 
         @media (max-width: 768px) {
             .header-title h1 { font-size: 1.2rem; }
@@ -154,7 +179,10 @@
             <!-- TAB 1: Materiales -->
             <div class="tab-content active" id="materials">
                 <div class="info-box">
-                    <div class="info-box-title"><i class="fas fa-info-circle"></i> Propiedades de Materiales<span class="norm-badge">E.060</span></div>
+                    <div class="info-box-title">
+                        <span><i class="fas fa-info-circle"></i> Propiedades de Materiales<span class="norm-badge">E.060</span></span>
+                        <button class="help-btn" onclick="showHelp('materials')"><i class="fas fa-question-circle"></i> Ayuda y Teoría</button>
+                    </div>
                     <p class="info-box-text">Cálculo de propiedades mecánicas del concreto y acero según RNE.</p>
                 </div>
                 <div class="calc-grid">
@@ -198,7 +226,10 @@
             <!-- TAB 2: Cargas -->
             <div class="tab-content" id="loads">
                 <div class="info-box">
-                    <div class="info-box-title"><i class="fas fa-info-circle"></i> Cálculo de Cargas<span class="norm-badge">E.020</span></div>
+                    <div class="info-box-title">
+                        <span><i class="fas fa-info-circle"></i> Cálculo de Cargas<span class="norm-badge">E.020</span></span>
+                        <button class="help-btn" onclick="showHelp('loads')"><i class="fas fa-question-circle"></i> Ayuda y Teoría</button>
+                    </div>
                     <p class="info-box-text">Determinación de cargas muertas, vivas y combinaciones según RNE.</p>
                 </div>
                 <div class="calc-grid">
@@ -251,7 +282,10 @@
             <!-- TAB 3: Vigas -->
             <div class="tab-content" id="beam">
                 <div class="info-box">
-                    <div class="info-box-title"><i class="fas fa-info-circle"></i> Diseño de Vigas<span class="norm-badge">E.060</span></div>
+                    <div class="info-box-title">
+                        <span><i class="fas fa-info-circle"></i> Diseño de Vigas<span class="norm-badge">E.060</span></span>
+                        <button class="help-btn" onclick="showHelp('beam')"><i class="fas fa-question-circle"></i> Ayuda y Teoría</button>
+                    </div>
                     <p class="info-box-text">Cálculo de momento resistente y área de acero para vigas rectangulares.</p>
                 </div>
                 <div class="calc-grid">
@@ -308,7 +342,10 @@
             <!-- TAB 4: Columnas -->
             <div class="tab-content" id="column">
                 <div class="info-box">
-                    <div class="info-box-title"><i class="fas fa-info-circle"></i> Diseño de Columnas<span class="norm-badge">E.060</span></div>
+                    <div class="info-box-title">
+                        <span><i class="fas fa-info-circle"></i> Diseño de Columnas<span class="norm-badge">E.060</span></span>
+                        <button class="help-btn" onclick="showHelp('column')"><i class="fas fa-question-circle"></i> Ayuda y Teoría</button>
+                    </div>
                     <p class="info-box-text">Verificación de capacidad de columnas a compresión axial.</p>
                 </div>
                 <div class="calc-grid">
@@ -360,7 +397,10 @@
             <!-- TAB 5: Losas -->
             <div class="tab-content" id="slab">
                 <div class="info-box">
-                    <div class="info-box-title"><i class="fas fa-info-circle"></i> Diseño de Losas<span class="norm-badge">E.060</span></div>
+                    <div class="info-box-title">
+                        <span><i class="fas fa-info-circle"></i> Diseño de Losas<span class="norm-badge">E.060</span></span>
+                        <button class="help-btn" onclick="showHelp('slab')"><i class="fas fa-question-circle"></i> Ayuda y Teoría</button>
+                    </div>
                     <p class="info-box-text">Verificación de espesores y cálculo de acero de refuerzo.</p>
                 </div>
                 <div class="calc-grid">
@@ -409,7 +449,10 @@
             <!-- TAB 6: Zapatas (NUEVO) -->
             <div class="tab-content" id="footing">
                 <div class="info-box">
-                    <div class="info-box-title"><i class="fas fa-info-circle"></i> Diseño de Zapatas Aisladas<span class="norm-badge">E.050</span></div>
+                    <div class="info-box-title">
+                        <span><i class="fas fa-info-circle"></i> Diseño de Zapatas Aisladas<span class="norm-badge">E.050</span></span>
+                        <button class="help-btn" onclick="showHelp('footing')"><i class="fas fa-question-circle"></i> Ayuda y Teoría</button>
+                    </div>
                     <p class="info-box-text">Diseño de zapatas cuadradas y rectangulares según RNE E.050 - Suelos y Cimentaciones.</p>
                 </div>
                 <div class="calc-grid">
@@ -476,6 +519,19 @@
             E.020 (Cargas) | E.050 (Suelos) | E.060 (Concreto Armado)
         </p>
     </footer>
+
+    <!-- Modal de Ayuda -->
+    <div class="modal" id="helpModal" onclick="closeHelpOnOutside(event)">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title" id="modalTitle"><i class="fas fa-book-open"></i> Ayuda y Teoría</div>
+                <button class="modal-close" onclick="closeHelp()">&times;</button>
+            </div>
+            <div class="modal-body" id="helpContent">
+                <!-- El contenido se cargará dinámicamente -->
+            </div>
+        </div>
+    </div>
 
     <script>
         // Theme
@@ -861,6 +917,464 @@
                 <line x1="${60+B*scale/2}" y1="70" x2="${60+B*scale/2}" y2="${30+B*scale}" stroke="${color2}" stroke-width="1" stroke-dasharray="2,2" class="draw-line" style="animation-delay:0.6s"/>
             `;
         }
+
+        // Help System
+        function showHelp(section) {
+            const modal = document.getElementById('helpModal');
+            const modalTitle = document.getElementById('modalTitle');
+            const helpContent = document.getElementById('helpContent');
+
+            const helpData = {
+                materials: {
+                    title: '<i class="fas fa-cubes"></i> Propiedades de Materiales - E.060',
+                    content: `
+                        <div class="help-section">
+                            <h3 class="help-section-title"><i class="fas fa-graduation-cap"></i> Conceptos Teóricos</h3>
+                            <p class="help-content">
+                                Los materiales de construcción tienen propiedades mecánicas que determinan su comportamiento bajo carga.
+                                El concreto trabaja principalmente a compresión, mientras que el acero de refuerzo resiste la tracción.
+                            </p>
+                            <ul class="help-list">
+                                <li><strong>f'c (Resistencia del Concreto):</strong> Resistencia a la compresión del concreto a los 28 días, medida en kg/cm²</li>
+                                <li><strong>fy (Fluencia del Acero):</strong> Esfuerzo de fluencia del acero de refuerzo, típicamente 4200 kg/cm² (Grado 60)</li>
+                                <li><strong>Módulo de Elasticidad (Ec):</strong> Mide la rigidez del concreto. Calculado como Ec = 15000√f'c según E.060</li>
+                                <li><strong>Relación Modular (n):</strong> n = Es/Ec, relaciona las deformaciones entre acero y concreto</li>
+                            </ul>
+                        </div>
+
+                        <div class="help-section">
+                            <h3 class="help-section-title"><i class="fas fa-calculator"></i> Fórmulas Principales</h3>
+                            <div class="formula-box">
+                                <div class="formula">Ec = 15000 × √f'c (kg/cm²)</div>
+                                <div class="formula">Es = 2,000,000 kg/cm² (constante)</div>
+                                <div class="formula">n = Es / Ec</div>
+                            </div>
+                        </div>
+
+                        <div class="help-section">
+                            <h3 class="help-section-title"><i class="fas fa-lightbulb"></i> Ejemplo Práctico</h3>
+                            <div class="example-box">
+                                <div class="example-title">Concreto f'c = 210 kg/cm², Acero fy = 4200 kg/cm²</div>
+                                <div class="example-data">
+                                    <div class="example-item">
+                                        <div class="example-label">Módulo Ec</div>
+                                        <div class="example-value">217,371 kg/cm²</div>
+                                    </div>
+                                    <div class="example-item">
+                                        <div class="example-label">Relación n</div>
+                                        <div class="example-value">9.20</div>
+                                    </div>
+                                    <div class="example-item">
+                                        <div class="example-label">Uso típico</div>
+                                        <div class="example-value">Viviendas, edificios</div>
+                                    </div>
+                                </div>
+                                <p style="margin-top:1rem; color:var(--text-secondary);">
+                                    Este es el concreto más usado en Perú para construcciones residenciales y comerciales típicas.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="help-section">
+                            <h3 class="help-section-title"><i class="fas fa-info-circle"></i> Cómo usar esta herramienta</h3>
+                            <ul class="help-list">
+                                <li>Selecciona la resistencia del concreto f'c según tu diseño (210 kg/cm² es el más común)</li>
+                                <li>Selecciona el acero de refuerzo fy (4200 kg/cm² Grado 60 es el estándar en Perú)</li>
+                                <li>Haz clic en "Calcular Propiedades" para obtener los módulos de elasticidad</li>
+                                <li>Usa estos valores como referencia para los cálculos en las otras pestañas</li>
+                            </ul>
+                        </div>
+                    `
+                },
+                loads: {
+                    title: '<i class="fas fa-weight"></i> Cálculo de Cargas - E.020',
+                    content: `
+                        <div class="help-section">
+                            <h3 class="help-section-title"><i class="fas fa-graduation-cap"></i> Conceptos Teóricos</h3>
+                            <p class="help-content">
+                                Las estructuras están sometidas a diferentes tipos de cargas. La norma E.020 del RNE establece los valores mínimos
+                                para cargas gravitacionales en edificaciones.
+                            </p>
+                            <ul class="help-list">
+                                <li><strong>Carga Muerta (CM):</strong> Peso permanente de la estructura (losa, acabados, muros). Incluye peso propio del concreto (2400 kg/m³)</li>
+                                <li><strong>Carga Viva (CV):</strong> Carga variable según el uso (personas, muebles). Depende del tipo de edificación</li>
+                                <li><strong>Carga Última (CU):</strong> Carga factorizada para diseño por resistencia, usa factores de seguridad</li>
+                                <li><strong>Combinación de Cargas:</strong> CU = 1.4CM + 1.7CV (combinación más común para gravedad)</li>
+                            </ul>
+                        </div>
+
+                        <div class="help-section">
+                            <h3 class="help-section-title"><i class="fas fa-table"></i> Cargas Vivas según E.020</h3>
+                            <ul class="help-list">
+                                <li>Vivienda: 200 kg/m²</li>
+                                <li>Oficinas: 250 kg/m²</li>
+                                <li>Aulas, educación: 300 kg/m²</li>
+                                <li>Lugares de reunión: 400 kg/m²</li>
+                                <li>Almacenes: 500 kg/m² (mínimo, puede ser mayor)</li>
+                            </ul>
+                        </div>
+
+                        <div class="help-section">
+                            <h3 class="help-section-title"><i class="fas fa-calculator"></i> Fórmulas Principales</h3>
+                            <div class="formula-box">
+                                <div class="formula">CM = (espesor × 2400) + acabados (kg/m²)</div>
+                                <div class="formula">CV = según tipo de edificación (kg/m²)</div>
+                                <div class="formula">CU = 1.4 × CM + 1.7 × CV (kg/m²)</div>
+                                <div class="formula">Carga Total = CU × Área tributaria (kg)</div>
+                            </div>
+                        </div>
+
+                        <div class="help-section">
+                            <h3 class="help-section-title"><i class="fas fa-lightbulb"></i> Ejemplo Práctico</h3>
+                            <div class="example-box">
+                                <div class="example-title">Losa de Vivienda, e=20cm, acabados=100 kg/m², área=20 m²</div>
+                                <div class="example-data">
+                                    <div class="example-item">
+                                        <div class="example-label">CM</div>
+                                        <div class="example-value">580 kg/m²</div>
+                                    </div>
+                                    <div class="example-item">
+                                        <div class="example-label">CV</div>
+                                        <div class="example-value">200 kg/m²</div>
+                                    </div>
+                                    <div class="example-item">
+                                        <div class="example-label">CU</div>
+                                        <div class="example-value">1,152 kg/m²</div>
+                                    </div>
+                                    <div class="example-item">
+                                        <div class="example-label">Carga Total</div>
+                                        <div class="example-value">23,040 kg</div>
+                                    </div>
+                                </div>
+                                <p style="margin-top:1rem; color:var(--text-secondary);">
+                                    Esta carga total se usa para diseñar las vigas que soportan esta área tributaria.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="help-section">
+                            <h3 class="help-section-title"><i class="fas fa-info-circle"></i> Cómo usar esta herramienta</h3>
+                            <ul class="help-list">
+                                <li>Selecciona el tipo de edificación según el uso previsto</li>
+                                <li>Ingresa el espesor de la losa en metros (típico: 0.20m para aligeradas)</li>
+                                <li>Ingresa el peso de acabados (pisos, cielo raso, tabiquería - típico: 100 kg/m²)</li>
+                                <li>Ingresa el área tributaria que carga sobre el elemento estructural</li>
+                                <li>Los resultados te darán la carga última a usar en diseño</li>
+                            </ul>
+                        </div>
+                    `
+                },
+                beam: {
+                    title: '<i class="fas fa-minus"></i> Diseño de Vigas - E.060',
+                    content: `
+                        <div class="help-section">
+                            <h3 class="help-section-title"><i class="fas fa-graduation-cap"></i> Conceptos Teóricos</h3>
+                            <p class="help-content">
+                                Las vigas son elementos estructurales que trabajan principalmente a flexión. El momento flector genera
+                                compresión en la parte superior y tracción en la inferior, donde se coloca el acero de refuerzo.
+                            </p>
+                            <ul class="help-list">
+                                <li><strong>Momento Último (Mu):</strong> Momento factorizado que debe resistir la viga, calculado de cargas últimas</li>
+                                <li><strong>Peralte Efectivo (d):</strong> Distancia desde la fibra extrema en compresión hasta el centroide del acero en tracción</li>
+                                <li><strong>Cuantía (ρ):</strong> Proporción de acero respecto al área de concreto. Debe estar entre ρmin y ρmax</li>
+                                <li><strong>Momento Resistente (φMn):</strong> Capacidad de la viga con factor de reducción φ=0.9 para flexión</li>
+                            </ul>
+                        </div>
+
+                        <div class="help-section">
+                            <h3 class="help-section-title"><i class="fas fa-calculator"></i> Fórmulas Principales</h3>
+                            <div class="formula-box">
+                                <div class="formula">d = h - recubrimiento - φbarra/2</div>
+                                <div class="formula">Rn = Mu / (0.9 × b × d²)</div>
+                                <div class="formula">ρ = (0.85f'c/fy) × [1 - √(1 - 2Rn/(0.85f'c))]</div>
+                                <div class="formula">As = ρ × b × d</div>
+                                <div class="formula">φMn ≥ Mu (verificación)</div>
+                            </div>
+                        </div>
+
+                        <div class="help-section">
+                            <h3 class="help-section-title"><i class="fas fa-lightbulb"></i> Ejemplo Práctico</h3>
+                            <div class="example-box">
+                                <div class="example-title">Viga 25×50 cm, f'c=210, fy=4200, Mu=1,000,000 kg-cm</div>
+                                <div class="example-data">
+                                    <div class="example-item">
+                                        <div class="example-label">Peralte d</div>
+                                        <div class="example-value">44.73 cm</div>
+                                    </div>
+                                    <div class="example-item">
+                                        <div class="example-label">Cuantía ρ</div>
+                                        <div class="example-value">0.2045%</div>
+                                    </div>
+                                    <div class="example-item">
+                                        <div class="example-label">Acero As</div>
+                                        <div class="example-value">2.28 cm²</div>
+                                    </div>
+                                    <div class="example-item">
+                                        <div class="example-label">Refuerzo</div>
+                                        <div class="example-value">2Ø3/8"</div>
+                                    </div>
+                                </div>
+                                <p style="margin-top:1rem; color:var(--text-secondary);">
+                                    Verificar que φMn ≥ Mu. Si no cumple, aumentar dimensiones de la viga o usar mayor f'c.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="help-section">
+                            <h3 class="help-section-title"><i class="fas fa-info-circle"></i> Cómo usar esta herramienta</h3>
+                            <ul class="help-list">
+                                <li>Ingresa f'c y fy según tus materiales (típico: 210 y 4200)</li>
+                                <li>Ingresa dimensiones de viga: base (b) típica 25cm, altura (h) según luz</li>
+                                <li>Recubrimiento: 4cm típico para vigas interiores, 5cm para exteriores</li>
+                                <li>Calcula Mu de tus cargas (wu×L²/8 para viga simplemente apoyada)</li>
+                                <li>Verifica que el mensaje sea "Viga OK" - si no, aumenta dimensiones</li>
+                            </ul>
+                        </div>
+                    `
+                },
+                column: {
+                    title: '<i class="fas fa-columns"></i> Diseño de Columnas - E.060',
+                    content: `
+                        <div class="help-section">
+                            <h3 class="help-section-title"><i class="fas fa-graduation-cap"></i> Conceptos Teóricos</h3>
+                            <p class="help-content">
+                                Las columnas son elementos verticales que soportan cargas axiales de compresión. El E.060 diferencia entre
+                                columnas cortas (falla por resistencia) y esbeltas (falla por pandeo).
+                            </p>
+                            <ul class="help-list">
+                                <li><strong>Carga Axial (Po):</strong> Capacidad nominal a compresión pura, suma de aportes de concreto y acero</li>
+                                <li><strong>Factor φ:</strong> φ=0.65 para columnas con estribos (confinamiento espiral: φ=0.70)</li>
+                                <li><strong>Esbeltez (klu/r):</strong> Relación entre altura efectiva y radio de giro. Si < 22, columna corta</li>
+                                <li><strong>Cuantía de Acero:</strong> Debe estar entre 1% y 6% del área bruta (típico: 1.5%-2.5%)</li>
+                            </ul>
+                        </div>
+
+                        <div class="help-section">
+                            <h3 class="help-section-title"><i class="fas fa-calculator"></i> Fórmulas Principales</h3>
+                            <div class="formula-box">
+                                <div class="formula">Ag = t × t (columna cuadrada)</div>
+                                <div class="formula">Ast = ρ × Ag</div>
+                                <div class="formula">Po = 0.85f'c(Ag - Ast) + fy×Ast</div>
+                                <div class="formula">φPn = 0.65 × 0.80 × Po</div>
+                                <div class="formula">esbeltez = H / (t/√12)</div>
+                            </div>
+                        </div>
+
+                        <div class="help-section">
+                            <h3 class="help-section-title"><i class="fas fa-lightbulb"></i> Ejemplo Práctico</h3>
+                            <div class="example-box">
+                                <div class="example-title">Columna 25×25 cm, H=3m, f'c=210, fy=4200, ρ=1.5%</div>
+                                <div class="example-data">
+                                    <div class="example-item">
+                                        <div class="example-label">Ag</div>
+                                        <div class="example-value">625 cm²</div>
+                                    </div>
+                                    <div class="example-item">
+                                        <div class="example-label">Ast</div>
+                                        <div class="example-value">9.38 cm²</div>
+                                    </div>
+                                    <div class="example-item">
+                                        <div class="example-label">φPn</div>
+                                        <div class="example-value">76,500 kg</div>
+                                    </div>
+                                    <div class="example-item">
+                                        <div class="example-label">Esbeltez</div>
+                                        <div class="example-value">41.57</div>
+                                    </div>
+                                </div>
+                                <p style="margin-top:1rem; color:var(--text-secondary);">
+                                    Esbeltez > 22: columna esbelta, considerar efectos de segundo orden. Refuerzo: 4Ø1/2" + 4Ø3/8".
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="help-section">
+                            <h3 class="help-section-title"><i class="fas fa-info-circle"></i> Cómo usar esta herramienta</h3>
+                            <ul class="help-list">
+                                <li>Dimensión típica en viviendas: 25×25 cm (mínimo recomendado)</li>
+                                <li>Altura es la distancia entre ejes de vigas (típico: 2.40m a 3.00m)</li>
+                                <li>Cuantía recomendada: 1.5% (económico) a 2% (estándar)</li>
+                                <li>Verifica que φPn sea mayor a tu carga de servicio factorizada</li>
+                                <li>Si esbeltez > 22, consulta con ingeniero sobre efectos de pandeo</li>
+                            </ul>
+                        </div>
+                    `
+                },
+                slab: {
+                    title: '<i class="fas fa-layer-group"></i> Diseño de Losas - E.060',
+                    content: `
+                        <div class="help-section">
+                            <h3 class="help-section-title"><i class="fas fa-graduation-cap"></i> Conceptos Teóricos</h3>
+                            <p class="help-content">
+                                Las losas son elementos horizontales que transmiten cargas a las vigas. Pueden ser aligeradas (con ladrillos)
+                                o macizas. El diseño controla deflexiones mediante espesores mínimos.
+                            </p>
+                            <ul class="help-list">
+                                <li><strong>Losa Aligerada:</strong> Más ligera, usa ladrillos huecos de 15cm o 20cm de altura. Espesor mínimo: L/25</li>
+                                <li><strong>Losa Maciza:</strong> Todo concreto, mayor peso pero más resistente. Espesor mínimo: L/28</li>
+                                <li><strong>Deflexión:</strong> Limitada a L/360 para cargas de servicio (confort y no agrietamiento)</li>
+                                <li><strong>Acero Mínimo:</strong> ρmin = 0.0018 para control de agrietamiento por temperatura y retracción</li>
+                            </ul>
+                        </div>
+
+                        <div class="help-section">
+                            <h3 class="help-section-title"><i class="fas fa-calculator"></i> Fórmulas Principales</h3>
+                            <div class="formula-box">
+                                <div class="formula">hmin = L/25 (aligerada) o L/28 (maciza)</div>
+                                <div class="formula">Mu = wu × L² / 8 (kg-cm/cm)</div>
+                                <div class="formula">Rn = Mu / (0.9 × b × d²)</div>
+                                <div class="formula">As = ρ × b × d (ρ ≥ 0.0018)</div>
+                                <div class="formula">Deflexión máx = L/360</div>
+                            </div>
+                        </div>
+
+                        <div class="help-section">
+                            <h3 class="help-section-title"><i class="fas fa-lightbulb"></i> Ejemplo Práctico</h3>
+                            <div class="example-box">
+                                <div class="example-title">Losa aligerada, L=4.5m, h=20cm, wu=800 kg/m²</div>
+                                <div class="example-data">
+                                    <div class="example-item">
+                                        <div class="example-label">hmin</div>
+                                        <div class="example-value">18 cm</div>
+                                    </div>
+                                    <div class="example-item">
+                                        <div class="example-label">Verificación</div>
+                                        <div class="example-value">h ≥ hmin ✓</div>
+                                    </div>
+                                    <div class="example-item">
+                                        <div class="example-label">Mu</div>
+                                        <div class="example-value">20.25 kg-m/m</div>
+                                    </div>
+                                    <div class="example-item">
+                                        <div class="example-label">As</div>
+                                        <div class="example-value">2.88 cm²/m</div>
+                                    </div>
+                                </div>
+                                <p style="margin-top:1rem; color:var(--text-secondary);">
+                                    Usar Ø3/8" @ 25cm (2.84 cm²/m) como acero positivo en zona central.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="help-section">
+                            <h3 class="help-section-title"><i class="fas fa-info-circle"></i> Cómo usar esta herramienta</h3>
+                            <ul class="help-list">
+                                <li>Ingresa la luz libre (L) entre apoyos en metros</li>
+                                <li>Selecciona tipo: aligerada (más común, h=20cm) o maciza (h=15cm típico)</li>
+                                <li>Espesor: 20cm para aligeradas en luces hasta 5m, 25cm para 5-6m</li>
+                                <li>Wu es la carga última del tab "Cargas" (CU en kg/m²)</li>
+                                <li>Si h < hmin, aumentar el espesor para evitar deflexiones excesivas</li>
+                            </ul>
+                        </div>
+                    `
+                },
+                footing: {
+                    title: '<i class="fas fa-th-large"></i> Diseño de Zapatas - E.050',
+                    content: `
+                        <div class="help-section">
+                            <h3 class="help-section-title"><i class="fas fa-graduation-cap"></i> Conceptos Teóricos</h3>
+                            <p class="help-content">
+                                Las zapatas transmiten las cargas de columnas al suelo. El diseño se basa en la capacidad portante del terreno
+                                determinada por estudio de suelos (E.050). Se verifica punzonamiento y flexión.
+                            </p>
+                            <ul class="help-list">
+                                <li><strong>Capacidad Portante (σt):</strong> Presión admisible del suelo, obtenida de estudio de suelos. Típico: 1.0-2.0 kg/cm²</li>
+                                <li><strong>Carga de Servicio (P):</strong> Carga sin factorizar para verificar presión sobre el suelo</li>
+                                <li><strong>Carga Última (Pu):</strong> Carga factorizada (1.4P) solo para diseñar el acero y espesor</li>
+                                <li><strong>Peralte Mínimo:</strong> 30cm según E.050, o 10% del lado de zapata (lo que sea mayor)</li>
+                            </ul>
+                        </div>
+
+                        <div class="help-section">
+                            <h3 class="help-section-title"><i class="fas fa-calculator"></i> Fórmulas Principales</h3>
+                            <div class="formula-box">
+                                <div class="formula">A = P / (σt × 10000) (m²)</div>
+                                <div class="formula">B = √A × 100 (cm, zapata cuadrada)</div>
+                                <div class="formula">q_servicio = P / B² ≤ σt</div>
+                                <div class="formula">qu = 1.4P / B² (para diseño)</div>
+                                <div class="formula">Mu = qu × L² / 2 (voladizo)</div>
+                            </div>
+                        </div>
+
+                        <div class="help-section">
+                            <h3 class="help-section-title"><i class="fas fa-lightbulb"></i> Ejemplo Práctico</h3>
+                            <div class="example-box">
+                                <div class="example-title">Columna 25×25 cm, P=50 ton, σt=1.5 kg/cm²</div>
+                                <div class="example-data">
+                                    <div class="example-item">
+                                        <div class="example-label">Área req.</div>
+                                        <div class="example-value">3.33 m²</div>
+                                    </div>
+                                    <div class="example-item">
+                                        <div class="example-label">Lado B</div>
+                                        <div class="example-value">185 cm</div>
+                                    </div>
+                                    <div class="example-item">
+                                        <div class="example-label">Altura h</div>
+                                        <div class="example-value">40 cm</div>
+                                    </div>
+                                    <div class="example-item">
+                                        <div class="example-label">Acero As</div>
+                                        <div class="example-value">8.2 cm²/m</div>
+                                    </div>
+                                </div>
+                                <p style="margin-top:1rem; color:var(--text-secondary);">
+                                    Usar malla Ø1/2" @ 20cm en ambas direcciones (9.93 cm²/m). Recubrimiento 7.5cm.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="help-section">
+                            <h3 class="help-section-title"><i class="fas fa-exclamation-triangle"></i> Puntos Críticos</h3>
+                            <ul class="help-list">
+                                <li><strong>IMPORTANTE:</strong> σt viene del estudio de suelos - NO inventar este valor</li>
+                                <li>Comparar presión DE SERVICIO (q = P/B²) vs σt, no presión última</li>
+                                <li>Profundidad mínima: 80cm bajo nivel natural del terreno (E.050)</li>
+                                <li>Verificar punzonamiento (no incluido en esta calculadora básica)</li>
+                            </ul>
+                        </div>
+
+                        <div class="help-section">
+                            <h3 class="help-section-title"><i class="fas fa-info-circle"></i> Cómo usar esta herramienta</h3>
+                            <ul class="help-list">
+                                <li>Obtén σt del estudio de suelos (típico en Lima: 1.0-1.5 kg/cm²)</li>
+                                <li>Carga P: suma de peso de columna, vigas y losas tributarias (sin factor)</li>
+                                <li>Dimensión columna: generalmente conocida del diseño estructural</li>
+                                <li>Profundidad Df: típico 1.2m a 1.5m según nivel de cimentación</li>
+                                <li>Verifica que "Presión OK" - si no, el suelo no soporta, necesitas zapata más grande</li>
+                            </ul>
+                        </div>
+                    `
+                }
+            };
+
+            const data = helpData[section];
+            if (data) {
+                modalTitle.innerHTML = data.title;
+                helpContent.innerHTML = data.content;
+                modal.classList.add('show');
+                document.body.style.overflow = 'hidden'; // Prevenir scroll del body
+            }
+        }
+
+        function closeHelp() {
+            const modal = document.getElementById('helpModal');
+            modal.classList.remove('show');
+            document.body.style.overflow = ''; // Restaurar scroll
+        }
+
+        function closeHelpOnOutside(event) {
+            if (event.target.id === 'helpModal') {
+                closeHelp();
+            }
+        }
+
+        // Cerrar modal con tecla ESC
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeHelp();
+            }
+        });
 
         // Init
         document.addEventListener('DOMContentLoaded', () => {
