@@ -457,8 +457,182 @@
         </p>
     </footer>
 
-    <script src="https://cdn.jsdelivr.net/npm/jstat@latest/dist/jstat.min.js"></script>
     <script>
+        // ===== FUNCIONES MATEMÁTICAS IMPLEMENTADAS DIRECTAMENTE =====
+        // No necesitamos bibliotecas externas, implementamos todo nosotros
+
+        // Error function (necesaria para Normal CDF)
+        function erf(x) {
+            // Aproximación de Abramowitz y Stegun
+            const sign = x >= 0 ? 1 : -1;
+            x = Math.abs(x);
+
+            const a1 = 0.254829592;
+            const a2 = -0.284496736;
+            const a3 = 1.421413741;
+            const a4 = -1.453152027;
+            const a5 = 1.061405429;
+            const p = 0.3275911;
+
+            const t = 1.0 / (1.0 + p * x);
+            const y = 1.0 - (((((a5 * t + a4) * t) + a3) * t + a2) * t + a1) * t * Math.exp(-x * x);
+
+            return sign * y;
+        }
+
+        // Gamma function (necesaria para t-Student y Chi-cuadrado)
+        function gamma(z) {
+            // Aproximación de Lanczos
+            const g = 7;
+            const C = [
+                0.99999999999980993,
+                676.5203681218851,
+                -1259.1392167224028,
+                771.32342877765313,
+                -176.61502916214059,
+                12.507343278686905,
+                -0.13857109526572012,
+                9.9843695780195716e-6,
+                1.5056327351493116e-7
+            ];
+
+            if (z < 0.5) {
+                return Math.PI / (Math.sin(Math.PI * z) * gamma(1 - z));
+            }
+
+            z -= 1;
+            let x = C[0];
+            for (let i = 1; i < g + 2; i++) {
+                x += C[i] / (z + i);
+            }
+
+            const t = z + g + 0.5;
+            return Math.sqrt(2 * Math.PI) * Math.pow(t, z + 0.5) * Math.exp(-t) * x;
+        }
+
+        // Beta function
+        function beta(a, b) {
+            return gamma(a) * gamma(b) / gamma(a + b);
+        }
+
+        // Incomplete beta function (para t-Student CDF)
+        function incompleteBeta(x, a, b) {
+            if (x === 0) return 0;
+            if (x === 1) return 1;
+
+            // Aproximación simple usando serie
+            const lbeta = Math.log(beta(a, b));
+            let sum = 0;
+            let term = 1;
+
+            for (let k = 0; k < 100; k++) {
+                term *= (k === 0) ? 1 : (a + k - 1) * x / k;
+                const denom = a + k;
+                sum += term / denom;
+
+                if (Math.abs(term / denom) < 1e-10) break;
+            }
+
+            return Math.exp(a * Math.log(x) + b * Math.log(1 - x) - lbeta) * sum;
+        }
+
+        // Normal CDF
+        function normalCDF(x, mu, sigma) {
+            return 0.5 * (1 + erf((x - mu) / (sigma * Math.sqrt(2))));
+        }
+
+        // t-Student PDF
+        function tStudentPDF(x, df) {
+            const num = gamma((df + 1) / 2);
+            const denom = Math.sqrt(df * Math.PI) * gamma(df / 2);
+            const base = 1 + (x * x) / df;
+            return (num / denom) * Math.pow(base, -(df + 1) / 2);
+        }
+
+        // t-Student CDF (aproximación)
+        function tStudentCDF(x, df) {
+            if (x === 0) return 0.5;
+
+            const t2 = x * x;
+            const a = df / (df + t2);
+            const b = t2 / (df + t2);
+
+            let cdf;
+            if (x > 0) {
+                cdf = 1 - 0.5 * incompleteBeta(a, df / 2, 0.5);
+            } else {
+                cdf = 0.5 * incompleteBeta(a, df / 2, 0.5);
+            }
+
+            return cdf;
+        }
+
+        // t-Student inverse (para valores críticos)
+        function tStudentInv(p, df) {
+            // Aproximación iterativa usando Newton-Raphson
+            if (p === 0.5) return 0;
+
+            let x = 0;
+            if (p < 0.5) {
+                x = -Math.sqrt(df * (1 / Math.pow(2 * p, 2 / df) - 1));
+            } else {
+                x = Math.sqrt(df * (1 / Math.pow(2 * (1 - p), 2 / df) - 1));
+            }
+
+            // Refinamiento Newton-Raphson
+            for (let i = 0; i < 10; i++) {
+                const fx = tStudentCDF(x, df) - p;
+                const fpx = tStudentPDF(x, df);
+                if (Math.abs(fpx) < 1e-10) break;
+                x = x - fx / fpx;
+            }
+
+            return x;
+        }
+
+        // Chi-cuadrado PDF
+        function chiSquarePDF(x, df) {
+            if (x <= 0) return 0;
+            const num = Math.pow(x, df / 2 - 1) * Math.exp(-x / 2);
+            const denom = Math.pow(2, df / 2) * gamma(df / 2);
+            return num / denom;
+        }
+
+        // Chi-cuadrado CDF (aproximación)
+        function chiSquareCDF(x, df) {
+            if (x <= 0) return 0;
+
+            // Usar relación con gamma incompleta
+            const sum = 0;
+            let term = Math.exp(-x / 2);
+            let result = term;
+
+            for (let k = 1; k < df / 2; k++) {
+                term *= x / (2 * k);
+                result += term;
+            }
+
+            return 1 - result;
+        }
+
+        // Chi-cuadrado inverse (para valores críticos)
+        function chiSquareInv(p, df) {
+            // Aproximación inicial
+            let x = df;
+
+            // Newton-Raphson
+            for (let i = 0; i < 20; i++) {
+                const fx = chiSquareCDF(x, df) - p;
+                const fpx = chiSquarePDF(x, df);
+                if (Math.abs(fpx) < 1e-10) break;
+                const newX = x - fx / fpx;
+                if (Math.abs(newX - x) < 1e-6) break;
+                x = Math.max(0.01, newX); // Evitar valores negativos
+            }
+
+            return x;
+        }
+
         // Theme Toggle
         function initTheme() {
             const theme = localStorage.getItem('theme') || 'dark';
@@ -542,9 +716,7 @@
             return coeff * Math.exp(exponent);
         }
 
-        function normalCDF(x, mu, sigma) {
-            return jstat.normal.cdf(x, mu, sigma);
-        }
+        // normalCDF ya está definida arriba
 
         function drawNormalDistribution() {
             const mu = parseFloat(document.getElementById('normalMu').value);
@@ -766,7 +938,7 @@
             document.getElementById('tStudentKurtosis').textContent = kurtosis !== Infinity ? kurtosis.toFixed(2) : '∞';
 
             const alpha = (100 - confidence) / 100;
-            const tCritical = jstat.studentt.inv(1 - alpha/2, df);
+            const tCritical = tStudentInv(1 - alpha/2, df);
             document.getElementById('tStudentCritical').textContent = `t crítico (bilateral, ${confidence}%) = ±${tCritical.toFixed(3)}`;
 
             // Draw SVG
@@ -782,7 +954,7 @@
             const xMin = -5, xMax = 5;
             const xScale = (x) => margin.left + ((x - xMin) / (xMax - xMin)) * plotWidth;
 
-            const yMax = jstat.studentt.pdf(0, df) * 1.2;
+            const yMax = tStudentPDF(0, df) * 1.2;
             const yScale = (y) => margin.top + plotHeight - (y / yMax) * plotHeight;
 
             // Draw axes
@@ -793,7 +965,7 @@
             let pathD = '';
             for (let i = 0; i <= 200; i++) {
                 const x = xMin + (xMax - xMin) * i / 200;
-                const y = jstat.studentt.pdf(x, df);
+                const y = tStudentPDF(x, df);
                 pathD += (i === 0 ? 'M' : 'L') + ` ${xScale(x)} ${yScale(y)}`;
             }
             svg.innerHTML += `<path d="${pathD}" fill="none" stroke="${colors.primary}" stroke-width="3" class="animated-curve"/>`;
@@ -802,7 +974,7 @@
             let normalPath = '';
             for (let i = 0; i <= 200; i++) {
                 const x = xMin + (xMax - xMin) * i / 200;
-                const y = jstat.normal.pdf(x, 0, 1);
+                const y = normalPDF(x, 0, 1);
                 normalPath += (i === 0 ? 'M' : 'L') + ` ${xScale(x)} ${yScale(y)}`;
             }
             svg.innerHTML += `<path d="${normalPath}" fill="none" stroke="${colors.secondary}" stroke-width="2" stroke-dasharray="5,5" opacity="0.6"/>`;
@@ -810,7 +982,7 @@
             // Shade critical regions
             let leftTail = `M ${xScale(xMin)} ${yScale(0)}`;
             for (let x = xMin; x <= -tCritical; x += 0.1) {
-                const y = jstat.studentt.pdf(x, df);
+                const y = tStudentPDF(x, df);
                 leftTail += ` L ${xScale(x)} ${yScale(y)}`;
             }
             leftTail += ` L ${xScale(-tCritical)} ${yScale(0)} Z`;
@@ -818,7 +990,7 @@
 
             let rightTail = `M ${xScale(tCritical)} ${yScale(0)}`;
             for (let x = tCritical; x <= xMax; x += 0.1) {
-                const y = jstat.studentt.pdf(x, df);
+                const y = tStudentPDF(x, df);
                 rightTail += ` L ${xScale(x)} ${yScale(y)}`;
             }
             rightTail += ` L ${xScale(xMax)} ${yScale(0)} Z`;
@@ -848,7 +1020,7 @@
             document.getElementById('chiSquareStd').textContent = Math.sqrt(2 * df).toFixed(2);
             document.getElementById('chiSquareSkew').textContent = Math.sqrt(8 / df).toFixed(2);
 
-            const chiCritical = jstat.chisquare.inv(1 - alpha, df);
+            const chiCritical = chiSquareInv(1 - alpha, df);
             document.getElementById('chiSquareCritical').textContent = `χ² crítico (α=${(alpha*100).toFixed(1)}%) = ${chiCritical.toFixed(3)}`;
 
             // Draw SVG
@@ -865,7 +1037,7 @@
             const xMax = Math.max(df + 4 * Math.sqrt(2 * df), chiCritical + 5);
             const xScale = (x) => margin.left + (x / xMax) * plotWidth;
 
-            const yMax = jstat.chisquare.pdf(Math.max(df - 2, 0.5), df) * 1.2;
+            const yMax = chiSquarePDF(Math.max(df - 2, 0.5), df) * 1.2;
             const yScale = (y) => margin.top + plotHeight - (y / yMax) * plotHeight;
 
             // Draw axes
@@ -876,7 +1048,7 @@
             let pathD = '';
             for (let i = 0; i <= 200; i++) {
                 const x = xMax * i / 200;
-                const y = jstat.chisquare.pdf(x, df);
+                const y = chiSquarePDF(x, df);
                 pathD += (i === 0 ? 'M' : 'L') + ` ${xScale(x)} ${yScale(y)}`;
             }
             svg.innerHTML += `<path d="${pathD}" fill="none" stroke="${colors.primary}" stroke-width="3" class="animated-curve"/>`;
@@ -884,7 +1056,7 @@
             // Shade critical region
             let criticalPath = `M ${xScale(chiCritical)} ${yScale(0)}`;
             for (let x = chiCritical; x <= xMax; x += xMax / 100) {
-                const y = jstat.chisquare.pdf(x, df);
+                const y = chiSquarePDF(x, df);
                 criticalPath += ` L ${xScale(x)} ${yScale(y)}`;
             }
             criticalPath += ` L ${xScale(xMax)} ${yScale(0)} Z`;
@@ -931,17 +1103,10 @@
         document.getElementById('chiSquareDf').addEventListener('input', drawChiSquareDistribution);
         document.getElementById('chiSquareAlpha').addEventListener('input', drawChiSquareDistribution);
 
-        // Initialize después de que jStat se cargue
+        // Initialize
         function initializeApp() {
             try {
-                // Verificar que jStat esté disponible
-                if (typeof jStat === 'undefined') {
-                    console.error('jStat no se cargó correctamente');
-                    alert('Error: La biblioteca de estadística no se cargó. Por favor recarga la página.');
-                    return;
-                }
-
-                console.log('✓ jStat cargado correctamente:', jStat.version || 'versión desconocida');
+                console.log('✓ Iniciando visualizador con funciones matemáticas propias');
 
                 initTheme();
                 initTabs();
@@ -965,16 +1130,15 @@
                 console.log('📊 Visualizador de Distribuciones Estadísticas - Cargado ✓');
             } catch (error) {
                 console.error('Error al inicializar:', error);
-                alert('Error al cargar las visualizaciones: ' + error.message);
+                alert('Error al cargar las visualizaciones: ' + error.message + '\n\nPor favor, abre la consola (F12) y reporta el error completo.');
             }
         }
 
-        // Esperar a que el DOM y jStat estén listos
+        // Esperar a que el DOM esté listo
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', initializeApp);
         } else {
-            // DOM ya está listo, esperar un momento para jStat
-            setTimeout(initializeApp, 100);
+            initializeApp();
         }
     </script>
 </body>
