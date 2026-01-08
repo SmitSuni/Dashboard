@@ -1,0 +1,924 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Visualizador Interactivo de Distribuciones Estadísticas - Normal, Binomial, Poisson, t-Student, Chi-cuadrado">
+    <meta name="author" content="Smit Alexander Suni Morales">
+    <meta name="keywords" content="estadística, distribuciones, normal, binomial, poisson, t-student, chi-cuadrado">
+
+    <meta name="theme-color" content="#0a0e14">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='0.9em' font-size='90'>📊</text></svg>">
+
+    <title>Visualizador de Distribuciones Estadísticas | Smit Alexander</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+
+        :root[data-theme="dark"] {
+            --bg-primary: #0a0e14; --bg-secondary: #151a21; --bg-tertiary: #1f2937; --bg-card: #1a1f2e;
+            --text-primary: #e6e9ef; --text-secondary: #9ca3af; --text-muted: #6b7280;
+            --accent-blue: #00d4ff; --accent-green: #00ff88; --accent-purple: #8b5cf6;
+            --accent-cyan: #06b6d4; --accent-orange: #ff6b35; --accent-red: #ef4444;
+            --border-color: #2d3748; --shadow-md: 0 4px 16px rgba(0,0,0,0.4);
+            --shadow-lg: 0 12px 32px rgba(0,0,0,0.6); --shadow-glow: 0 0 20px rgba(0,212,255,0.3);
+        }
+        :root[data-theme="light"] {
+            --bg-primary: #f0f4f8; --bg-secondary: #ffffff; --bg-tertiary: #e2e8f0; --bg-card: #ffffff;
+            --text-primary: #1a202c; --text-secondary: #4a5568; --text-muted: #718096;
+            --accent-blue: #0088cc; --accent-green: #00cc66; --accent-purple: #7c3aed;
+            --accent-cyan: #0891b2; --accent-orange: #ea580c; --accent-red: #dc2626;
+            --border-color: #cbd5e0; --shadow-md: 0 4px 16px rgba(0,0,0,0.15);
+            --shadow-lg: 0 12px 32px rgba(0,0,0,0.2); --shadow-glow: 0 0 20px rgba(0,136,204,0.2);
+        }
+
+        body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; background: var(--bg-primary); color: var(--text-primary); min-height: 100vh; line-height: 1.6; transition: all 0.3s; }
+
+        /* Header */
+        .header { background: var(--bg-card); border-bottom: 2px solid var(--border-color); padding: 1.5rem 2rem; box-shadow: var(--shadow-md); position: sticky; top: 0; z-index: 100; }
+        .header-container { max-width: 1400px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; }
+        .header-title { display: flex; align-items: center; gap: 1rem; }
+        .header-icon { font-size: 2rem; }
+        .header-title h1 { font-size: 1.6rem; background: linear-gradient(135deg, var(--accent-blue), var(--accent-green)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .header-subtitle { font-size: 0.85rem; color: var(--text-muted); margin-top: 0.2rem; }
+        .header-actions { display: flex; gap: 1rem; align-items: center; }
+
+        .btn { padding: 0.6rem 1.2rem; background: var(--bg-tertiary); border: 2px solid var(--border-color); border-radius: 8px; color: var(--text-primary); text-decoration: none; font-weight: 600; transition: all 0.3s; display: inline-flex; align-items: center; gap: 0.5rem; cursor: pointer; }
+        .btn:hover { border-color: var(--accent-blue); transform: translateY(-2px); box-shadow: var(--shadow-glow); }
+        .btn-primary { background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple)); border-color: transparent; color: white; }
+
+        .theme-toggle { width: 45px; height: 45px; border-radius: 50%; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; }
+        .theme-toggle i { font-size: 1.2rem; position: absolute; transition: all 0.3s; }
+        .theme-toggle .fa-sun { color: var(--accent-orange); transform: rotate(0deg); }
+        .theme-toggle .fa-moon { color: var(--accent-cyan); transform: rotate(180deg) scale(0); }
+        [data-theme="light"] .theme-toggle .fa-sun { transform: rotate(180deg) scale(0); }
+        [data-theme="light"] .theme-toggle .fa-moon { transform: rotate(0deg) scale(1); }
+
+        /* Container */
+        .container { max-width: 1400px; margin: 0 auto; padding: 2rem; }
+
+        /* Tabs */
+        .tabs-container { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; padding: 1.5rem; box-shadow: var(--shadow-md); margin-bottom: 2rem; }
+        .tabs-header { display: flex; gap: 0.5rem; flex-wrap: wrap; border-bottom: 2px solid var(--border-color); padding-bottom: 1rem; margin-bottom: 2rem; }
+        .tab-btn { padding: 0.8rem 1.5rem; background: var(--bg-secondary); border: 2px solid var(--border-color); border-radius: 8px; color: var(--text-secondary); font-weight: 600; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; gap: 0.5rem; font-size: 0.95rem; }
+        .tab-btn:hover { border-color: var(--accent-cyan); color: var(--text-primary); }
+        .tab-btn.active { background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple)); border-color: transparent; color: white; box-shadow: var(--shadow-glow); }
+
+        .tab-content { display: none; animation: fadeIn 0.5s; }
+        .tab-content.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Info Box */
+        .info-box { background: var(--bg-secondary); border-left: 4px solid var(--accent-cyan); padding: 1.2rem; border-radius: 8px; margin-bottom: 1.5rem; }
+        .info-box-title { font-weight: 600; color: var(--accent-cyan); margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem; }
+        .info-box-text { color: var(--text-secondary); font-size: 0.95rem; line-height: 1.6; }
+
+        /* Controls */
+        .controls-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; margin-bottom: 2rem; }
+        .control-group { background: var(--bg-secondary); padding: 1.5rem; border-radius: 12px; border: 1px solid var(--border-color); }
+        .control-label { font-size: 0.95rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 0.8rem; display: flex; align-items: center; justify-content: space-between; }
+        .control-value { color: var(--accent-cyan); font-size: 1.1rem; font-weight: 700; }
+
+        .slider { -webkit-appearance: none; appearance: none; width: 100%; height: 8px; border-radius: 5px; background: var(--bg-tertiary); outline: none; }
+        .slider::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 20px; height: 20px; border-radius: 50%; background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple)); cursor: pointer; box-shadow: 0 2px 8px rgba(0,212,255,0.5); }
+        .slider::-moz-range-thumb { width: 20px; height: 20px; border-radius: 50%; background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple)); cursor: pointer; border: none; box-shadow: 0 2px 8px rgba(0,212,255,0.5); }
+
+        /* Visualization */
+        .viz-container { background: var(--bg-secondary); border: 2px solid var(--border-color); border-radius: 12px; padding: 2rem; margin: 2rem 0; }
+        .viz-title { font-size: 1.3rem; font-weight: 700; color: var(--text-primary); margin-bottom: 1.5rem; display: flex; align-items: center; justify-content: center; gap: 0.8rem; }
+        .svg-canvas { width: 100%; max-width: 900px; height: 450px; border: 1px solid var(--border-color); border-radius: 8px; background: var(--bg-card); margin: 0 auto; display: block; }
+
+        /* Stats */
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin-top: 2rem; }
+        .stat-card { background: var(--bg-card); padding: 1.2rem; border-radius: 8px; border: 1px solid var(--border-color); text-align: center; }
+        .stat-label { font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.5rem; }
+        .stat-value { font-size: 1.5rem; font-weight: 700; color: var(--accent-green); }
+
+        /* Probability Calculator */
+        .prob-calculator { background: linear-gradient(135deg, var(--bg-secondary), var(--bg-tertiary)); border: 2px solid var(--accent-purple); border-radius: 12px; padding: 1.5rem; margin-top: 2rem; }
+        .prob-title { font-size: 1.2rem; font-weight: 700; color: var(--accent-purple); margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem; }
+        .prob-inputs { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 1rem; }
+        .prob-input-group { display: flex; flex-direction: column; gap: 0.5rem; }
+        .prob-input-label { font-size: 0.9rem; color: var(--text-secondary); font-weight: 600; }
+        .prob-input { padding: 0.7rem; background: var(--bg-card); border: 2px solid var(--border-color); border-radius: 6px; color: var(--text-primary); font-size: 1rem; font-weight: 600; }
+        .prob-input:focus { outline: none; border-color: var(--accent-purple); }
+        .prob-result { background: var(--bg-card); padding: 1rem; border-radius: 8px; border-left: 4px solid var(--accent-green); margin-top: 1rem; }
+        .prob-result-text { color: var(--text-primary); font-size: 1.1rem; font-weight: 600; }
+
+        /* Footer */
+        .footer { text-align: center; padding: 2rem; border-top: 1px solid var(--border-color); margin-top: 3rem; color: var(--text-muted); }
+
+        /* Animations */
+        .animated-curve { opacity: 0; animation: drawCurve 1s ease-out forwards; }
+        @keyframes drawCurve { to { opacity: 1; } }
+
+        @media (max-width: 768px) {
+            .header-title h1 { font-size: 1.2rem; }
+            .tabs-header { gap: 0.3rem; }
+            .tab-btn { padding: 0.6rem 1rem; font-size: 0.85rem; }
+            .controls-grid { grid-template-columns: 1fr; }
+            .svg-canvas { height: 350px; }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-container">
+            <div class="header-title">
+                <i class="fas fa-chart-line header-icon" style="color: var(--accent-purple);"></i>
+                <div>
+                    <h1>Visualizador de Distribuciones Estadísticas</h1>
+                    <div class="header-subtitle">Interactivo y Animado | Ingeniería Estadística</div>
+                </div>
+            </div>
+            <div class="header-actions">
+                <button class="btn theme-toggle" id="theme-toggle">
+                    <i class="fas fa-sun"></i>
+                    <i class="fas fa-moon"></i>
+                </button>
+                <a href="../index.html" class="btn btn-primary">
+                    <i class="fas fa-home"></i>
+                    Dashboard
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main class="container">
+        <div class="tabs-container">
+            <div class="tabs-header">
+                <button class="tab-btn active" data-tab="normal"><i class="fas fa-bell"></i> Normal</button>
+                <button class="tab-btn" data-tab="binomial"><i class="fas fa-dice"></i> Binomial</button>
+                <button class="tab-btn" data-tab="poisson"><i class="fas fa-random"></i> Poisson</button>
+                <button class="tab-btn" data-tab="tstudent"><i class="fas fa-graduation-cap"></i> t-Student</button>
+                <button class="tab-btn" data-tab="chisquare"><i class="fas fa-square-root-alt"></i> Chi-cuadrado</button>
+            </div>
+
+            <!-- TAB 1: Normal Distribution -->
+            <div class="tab-content active" id="normal">
+                <div class="info-box">
+                    <div class="info-box-title"><i class="fas fa-info-circle"></i> Distribución Normal (Gaussiana)</div>
+                    <p class="info-box-text">La distribución más importante en estadística. Modela fenómenos naturales, errores de medición, y es la base del Teorema del Límite Central. Caracterizada por su forma de campana simétrica.</p>
+                </div>
+
+                <div class="controls-grid">
+                    <div class="control-group">
+                        <label class="control-label">
+                            <span><i class="fas fa-arrows-alt-h"></i> Media (μ)</span>
+                            <span class="control-value" id="normalMuValue">0</span>
+                        </label>
+                        <input type="range" class="slider" id="normalMu" min="-10" max="10" step="0.1" value="0">
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label">
+                            <span><i class="fas fa-compress-arrows-alt"></i> Desviación Estándar (σ)</span>
+                            <span class="control-value" id="normalSigmaValue">1</span>
+                        </label>
+                        <input type="range" class="slider" id="normalSigma" min="0.1" max="5" step="0.1" value="1">
+                    </div>
+                </div>
+
+                <div class="viz-container">
+                    <div class="viz-title"><i class="fas fa-chart-area"></i> Función de Densidad de Probabilidad (PDF)</div>
+                    <svg class="svg-canvas" id="normalSVG" viewBox="0 0 900 450"></svg>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-label">Media (μ)</div>
+                        <div class="stat-value" id="normalMean">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Varianza (σ²)</div>
+                        <div class="stat-value" id="normalVariance">1</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Desv. Estándar (σ)</div>
+                        <div class="stat-value" id="normalStd">1</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Asimetría</div>
+                        <div class="stat-value">0</div>
+                    </div>
+                </div>
+
+                <div class="prob-calculator">
+                    <div class="prob-title"><i class="fas fa-calculator"></i> Calculadora de Probabilidades</div>
+                    <div class="prob-inputs">
+                        <div class="prob-input-group">
+                            <label class="prob-input-label">Valor inferior (a)</label>
+                            <input type="number" class="prob-input" id="normalA" value="-1" step="0.1">
+                        </div>
+                        <div class="prob-input-group">
+                            <label class="prob-input-label">Valor superior (b)</label>
+                            <input type="number" class="prob-input" id="normalB" value="1" step="0.1">
+                        </div>
+                    </div>
+                    <div class="prob-result">
+                        <div class="prob-result-text" id="normalProb">P(a < X < b) = 0.6827</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 2: Binomial Distribution -->
+            <div class="tab-content" id="binomial">
+                <div class="info-box">
+                    <div class="info-box-title"><i class="fas fa-info-circle"></i> Distribución Binomial</div>
+                    <p class="info-box-text">Modela el número de éxitos en n ensayos independientes con probabilidad p de éxito. Ejemplos: lanzamiento de monedas, control de calidad, encuestas (sí/no).</p>
+                </div>
+
+                <div class="controls-grid">
+                    <div class="control-group">
+                        <label class="control-label">
+                            <span><i class="fas fa-hashtag"></i> Número de ensayos (n)</span>
+                            <span class="control-value" id="binomialNValue">10</span>
+                        </label>
+                        <input type="range" class="slider" id="binomialN" min="1" max="50" step="1" value="10">
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label">
+                            <span><i class="fas fa-percentage"></i> Probabilidad de éxito (p)</span>
+                            <span class="control-value" id="binomialPValue">0.5</span>
+                        </label>
+                        <input type="range" class="slider" id="binomialP" min="0.01" max="0.99" step="0.01" value="0.5">
+                    </div>
+                </div>
+
+                <div class="viz-container">
+                    <div class="viz-title"><i class="fas fa-chart-bar"></i> Función de Masa de Probabilidad (PMF)</div>
+                    <svg class="svg-canvas" id="binomialSVG" viewBox="0 0 900 450"></svg>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-label">Media (μ)</div>
+                        <div class="stat-value" id="binomialMean">5</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Varianza (σ²)</div>
+                        <div class="stat-value" id="binomialVariance">2.5</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Desv. Estándar (σ)</div>
+                        <div class="stat-value" id="binomialStd">1.58</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Moda</div>
+                        <div class="stat-value" id="binomialMode">5</div>
+                    </div>
+                </div>
+
+                <div class="prob-calculator">
+                    <div class="prob-title"><i class="fas fa-calculator"></i> Calculadora de Probabilidades</div>
+                    <div class="prob-inputs">
+                        <div class="prob-input-group">
+                            <label class="prob-input-label">Número de éxitos (k)</label>
+                            <input type="number" class="prob-input" id="binomialK" value="5" step="1" min="0">
+                        </div>
+                    </div>
+                    <div class="prob-result">
+                        <div class="prob-result-text" id="binomialProb">P(X = k) = 0.2461</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 3: Poisson Distribution -->
+            <div class="tab-content" id="poisson">
+                <div class="info-box">
+                    <div class="info-box-title"><i class="fas fa-info-circle"></i> Distribución de Poisson</div>
+                    <p class="info-box-text">Modela eventos raros que ocurren en un intervalo de tiempo o espacio. Ejemplos: llegadas de clientes, llamadas telefónicas, accidentes, defectos en producción.</p>
+                </div>
+
+                <div class="controls-grid">
+                    <div class="control-group">
+                        <label class="control-label">
+                            <span><i class="fas fa-lambda"></i> Tasa media (λ)</span>
+                            <span class="control-value" id="poissonLambdaValue">3</span>
+                        </label>
+                        <input type="range" class="slider" id="poissonLambda" min="0.1" max="20" step="0.1" value="3">
+                    </div>
+                </div>
+
+                <div class="viz-container">
+                    <div class="viz-title"><i class="fas fa-chart-bar"></i> Función de Masa de Probabilidad (PMF)</div>
+                    <svg class="svg-canvas" id="poissonSVG" viewBox="0 0 900 450"></svg>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-label">Media (μ)</div>
+                        <div class="stat-value" id="poissonMean">3</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Varianza (σ²)</div>
+                        <div class="stat-value" id="poissonVariance">3</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Desv. Estándar (σ)</div>
+                        <div class="stat-value" id="poissonStd">1.73</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Asimetría</div>
+                        <div class="stat-value" id="poissonSkew">0.58</div>
+                    </div>
+                </div>
+
+                <div class="prob-calculator">
+                    <div class="prob-title"><i class="fas fa-calculator"></i> Calculadora de Probabilidades</div>
+                    <div class="prob-inputs">
+                        <div class="prob-input-group">
+                            <label class="prob-input-label">Número de eventos (k)</label>
+                            <input type="number" class="prob-input" id="poissonK" value="3" step="1" min="0">
+                        </div>
+                    </div>
+                    <div class="prob-result">
+                        <div class="prob-result-text" id="poissonProb">P(X = k) = 0.2240</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 4: t-Student Distribution -->
+            <div class="tab-content" id="tstudent">
+                <div class="info-box">
+                    <div class="info-box-title"><i class="fas fa-info-circle"></i> Distribución t-Student</div>
+                    <p class="info-box-text">Usada en inferencia estadística cuando el tamaño de muestra es pequeño o la desviación estándar poblacional es desconocida. Fundamental para pruebas de hipótesis e intervalos de confianza.</p>
+                </div>
+
+                <div class="controls-grid">
+                    <div class="control-group">
+                        <label class="control-label">
+                            <span><i class="fas fa-hashtag"></i> Grados de libertad (ν)</span>
+                            <span class="control-value" id="tStudentDfValue">5</span>
+                        </label>
+                        <input type="range" class="slider" id="tStudentDf" min="1" max="30" step="1" value="5">
+                    </div>
+                </div>
+
+                <div class="viz-container">
+                    <div class="viz-title"><i class="fas fa-chart-area"></i> Función de Densidad de Probabilidad (PDF)</div>
+                    <svg class="svg-canvas" id="tStudentSVG" viewBox="0 0 900 450"></svg>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-label">Media (μ)</div>
+                        <div class="stat-value">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Varianza (σ²)</div>
+                        <div class="stat-value" id="tStudentVariance">1.67</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Desv. Estándar (σ)</div>
+                        <div class="stat-value" id="tStudentStd">1.29</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Curtosis</div>
+                        <div class="stat-value" id="tStudentKurtosis">9</div>
+                    </div>
+                </div>
+
+                <div class="prob-calculator">
+                    <div class="prob-title"><i class="fas fa-calculator"></i> Calculadora de Valores Críticos</div>
+                    <div class="prob-inputs">
+                        <div class="prob-input-group">
+                            <label class="prob-input-label">Nivel de confianza (%)</label>
+                            <input type="number" class="prob-input" id="tStudentConfidence" value="95" step="1" min="90" max="99.9">
+                        </div>
+                    </div>
+                    <div class="prob-result">
+                        <div class="prob-result-text" id="tStudentCritical">t crítico (bilateral) = ±2.571</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 5: Chi-Square Distribution -->
+            <div class="tab-content" id="chisquare">
+                <div class="info-box">
+                    <div class="info-box-title"><i class="fas fa-info-circle"></i> Distribución Chi-cuadrado (χ²)</div>
+                    <p class="info-box-text">Utilizada en pruebas de bondad de ajuste, independencia y homogeneidad. También para estimación de varianzas. Es la suma de cuadrados de variables normales estándar independientes.</p>
+                </div>
+
+                <div class="controls-grid">
+                    <div class="control-group">
+                        <label class="control-label">
+                            <span><i class="fas fa-hashtag"></i> Grados de libertad (k)</span>
+                            <span class="control-value" id="chiSquareDfValue">5</span>
+                        </label>
+                        <input type="range" class="slider" id="chiSquareDf" min="1" max="30" step="1" value="5">
+                    </div>
+                </div>
+
+                <div class="viz-container">
+                    <div class="viz-title"><i class="fas fa-chart-area"></i> Función de Densidad de Probabilidad (PDF)</div>
+                    <svg class="svg-canvas" id="chiSquareSVG" viewBox="0 0 900 450"></svg>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-label">Media (μ)</div>
+                        <div class="stat-value" id="chiSquareMean">5</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Varianza (σ²)</div>
+                        <div class="stat-value" id="chiSquareVariance">10</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Desv. Estándar (σ)</div>
+                        <div class="stat-value" id="chiSquareStd">3.16</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Asimetría</div>
+                        <div class="stat-value" id="chiSquareSkew">1.26</div>
+                    </div>
+                </div>
+
+                <div class="prob-calculator">
+                    <div class="prob-title"><i class="fas fa-calculator"></i> Calculadora de Valores Críticos</div>
+                    <div class="prob-inputs">
+                        <div class="prob-input-group">
+                            <label class="prob-input-label">Nivel de significancia α (%)</label>
+                            <input type="number" class="prob-input" id="chiSquareAlpha" value="5" step="0.1" min="0.1" max="50">
+                        </div>
+                    </div>
+                    <div class="prob-result">
+                        <div class="prob-result-text" id="chiSquareCritical">χ² crítico (cola derecha) = 11.070</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <p>&copy; 2025 Smit Alexander Suni Morales. Todos los derechos reservados.</p>
+        <p style="margin-top: 0.5rem; color: var(--accent-cyan);">
+            Visualizador Interactivo de Distribuciones Estadísticas | Ingeniería Estadística e Informática
+        </p>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/jstat@latest/dist/jstat.min.js"></script>
+    <script>
+        // Theme Toggle
+        function initTheme() {
+            const theme = localStorage.getItem('theme') || 'dark';
+            document.documentElement.setAttribute('data-theme', theme);
+            document.getElementById('theme-toggle').addEventListener('click', () => {
+                const current = document.documentElement.getAttribute('data-theme');
+                const newTheme = current === 'dark' ? 'light' : 'dark';
+                document.documentElement.setAttribute('data-theme', newTheme);
+                localStorage.setItem('theme', newTheme);
+                // Redraw all charts with new theme
+                updateAllCharts();
+            });
+        }
+
+        // Tabs System
+        function initTabs() {
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const target = btn.getAttribute('data-tab');
+                    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                    btn.classList.add('active');
+                    document.getElementById(target).classList.add('active');
+                });
+            });
+        }
+
+        // Get theme colors
+        function getColors() {
+            const theme = document.documentElement.getAttribute('data-theme');
+            return {
+                primary: theme === 'dark' ? '#00d4ff' : '#0088cc',
+                secondary: theme === 'dark' ? '#00ff88' : '#00cc66',
+                purple: theme === 'dark' ? '#8b5cf6' : '#7c3aed',
+                text: theme === 'dark' ? '#e6e9ef' : '#1a202c',
+                grid: theme === 'dark' ? '#2d3748' : '#cbd5e0',
+                bg: theme === 'dark' ? '#1a1f2e' : '#ffffff'
+            };
+        }
+
+        // Utility: Factorial
+        function factorial(n) {
+            if (n <= 1) return 1;
+            return n * factorial(n - 1);
+        }
+
+        // Utility: Binomial coefficient
+        function binomialCoeff(n, k) {
+            if (k > n) return 0;
+            if (k === 0 || k === n) return 1;
+            return factorial(n) / (factorial(k) * factorial(n - k));
+        }
+
+        // === NORMAL DISTRIBUTION ===
+        function normalPDF(x, mu, sigma) {
+            const coeff = 1 / (sigma * Math.sqrt(2 * Math.PI));
+            const exponent = -Math.pow(x - mu, 2) / (2 * sigma * sigma);
+            return coeff * Math.exp(exponent);
+        }
+
+        function normalCDF(x, mu, sigma) {
+            return jstat.normal.cdf(x, mu, sigma);
+        }
+
+        function drawNormalDistribution() {
+            const mu = parseFloat(document.getElementById('normalMu').value);
+            const sigma = parseFloat(document.getElementById('normalSigma').value);
+            const a = parseFloat(document.getElementById('normalA').value);
+            const b = parseFloat(document.getElementById('normalB').value);
+
+            // Update value displays
+            document.getElementById('normalMuValue').textContent = mu.toFixed(1);
+            document.getElementById('normalSigmaValue').textContent = sigma.toFixed(1);
+            document.getElementById('normalMean').textContent = mu.toFixed(2);
+            document.getElementById('normalVariance').textContent = (sigma * sigma).toFixed(2);
+            document.getElementById('normalStd').textContent = sigma.toFixed(2);
+
+            // Calculate probability
+            const probA = normalCDF(a, mu, sigma);
+            const probB = normalCDF(b, mu, sigma);
+            const prob = probB - probA;
+            document.getElementById('normalProb').textContent = `P(${a} < X < ${b}) = ${prob.toFixed(4)}`;
+
+            // Draw SVG
+            const svg = document.getElementById('normalSVG');
+            svg.innerHTML = '';
+            const colors = getColors();
+
+            const width = 900, height = 450;
+            const margin = { top: 40, right: 40, bottom: 60, left: 60 };
+            const plotWidth = width - margin.left - margin.right;
+            const plotHeight = height - margin.top - margin.bottom;
+
+            // Calculate range
+            const xMin = mu - 4 * sigma;
+            const xMax = mu + 4 * sigma;
+            const xScale = (x) => margin.left + ((x - xMin) / (xMax - xMin)) * plotWidth;
+
+            const yMax = normalPDF(mu, mu, sigma) * 1.2;
+            const yScale = (y) => margin.top + plotHeight - (y / yMax) * plotHeight;
+
+            // Draw axes
+            svg.innerHTML += `<line x1="${margin.left}" y1="${margin.top + plotHeight}" x2="${width - margin.right}" y2="${margin.top + plotHeight}" stroke="${colors.grid}" stroke-width="2"/>`;
+            svg.innerHTML += `<line x1="${margin.left}" y1="${margin.top}" x2="${margin.left}" y2="${margin.top + plotHeight}" stroke="${colors.grid}" stroke-width="2"/>`;
+
+            // Draw grid
+            for (let i = 0; i <= 5; i++) {
+                const x = xMin + (xMax - xMin) * i / 5;
+                const xPos = xScale(x);
+                svg.innerHTML += `<line x1="${xPos}" y1="${margin.top}" x2="${xPos}" y2="${margin.top + plotHeight}" stroke="${colors.grid}" stroke-width="1" opacity="0.3" stroke-dasharray="5,5"/>`;
+                svg.innerHTML += `<text x="${xPos}" y="${margin.top + plotHeight + 25}" fill="${colors.text}" font-size="12" text-anchor="middle">${x.toFixed(1)}</text>`;
+            }
+
+            // Draw normal curve
+            let pathD = '';
+            for (let i = 0; i <= 200; i++) {
+                const x = xMin + (xMax - xMin) * i / 200;
+                const y = normalPDF(x, mu, sigma);
+                const xPos = xScale(x);
+                const yPos = yScale(y);
+                pathD += (i === 0 ? 'M' : 'L') + ` ${xPos} ${yPos}`;
+            }
+            svg.innerHTML += `<path d="${pathD}" fill="none" stroke="${colors.primary}" stroke-width="3" class="animated-curve"/>`;
+
+            // Draw shaded area
+            let shadedPath = `M ${xScale(a)} ${yScale(0)}`;
+            for (let x = a; x <= b; x += (b - a) / 100) {
+                const y = normalPDF(x, mu, sigma);
+                shadedPath += ` L ${xScale(x)} ${yScale(y)}`;
+            }
+            shadedPath += ` L ${xScale(b)} ${yScale(0)} Z`;
+            svg.innerHTML += `<path d="${shadedPath}" fill="${colors.purple}" opacity="0.3"/>`;
+
+            // Labels
+            svg.innerHTML += `<text x="${width/2}" y="30" fill="${colors.text}" font-size="16" font-weight="bold" text-anchor="middle">Distribución Normal (μ=${mu}, σ=${sigma})</text>`;
+            svg.innerHTML += `<text x="${width/2}" y="${height - 10}" fill="${colors.text}" font-size="14" text-anchor="middle">x</text>`;
+            svg.innerHTML += `<text x="20" y="${height/2}" fill="${colors.text}" font-size="14" text-anchor="middle" transform="rotate(-90, 20, ${height/2})">f(x)</text>`;
+        }
+
+        // === BINOMIAL DISTRIBUTION ===
+        function binomialPMF(k, n, p) {
+            return binomialCoeff(n, k) * Math.pow(p, k) * Math.pow(1 - p, n - k);
+        }
+
+        function drawBinomialDistribution() {
+            const n = parseInt(document.getElementById('binomialN').value);
+            const p = parseFloat(document.getElementById('binomialP').value);
+            const k = parseInt(document.getElementById('binomialK').value);
+
+            document.getElementById('binomialNValue').textContent = n;
+            document.getElementById('binomialPValue').textContent = p.toFixed(2);
+
+            const mean = n * p;
+            const variance = n * p * (1 - p);
+            const std = Math.sqrt(variance);
+            const mode = Math.floor((n + 1) * p);
+
+            document.getElementById('binomialMean').textContent = mean.toFixed(2);
+            document.getElementById('binomialVariance').textContent = variance.toFixed(2);
+            document.getElementById('binomialStd').textContent = std.toFixed(2);
+            document.getElementById('binomialMode').textContent = mode;
+
+            const prob = binomialPMF(k, n, p);
+            document.getElementById('binomialProb').textContent = `P(X = ${k}) = ${prob.toFixed(4)}`;
+
+            // Draw SVG
+            const svg = document.getElementById('binomialSVG');
+            svg.innerHTML = '';
+            const colors = getColors();
+
+            const width = 900, height = 450;
+            const margin = { top: 40, right: 40, bottom: 60, left: 60 };
+            const plotWidth = width - margin.left - margin.right;
+            const plotHeight = height - margin.top - margin.bottom;
+
+            const xScale = (x) => margin.left + (x / n) * plotWidth;
+
+            let yMax = 0;
+            for (let i = 0; i <= n; i++) {
+                yMax = Math.max(yMax, binomialPMF(i, n, p));
+            }
+            yMax *= 1.2;
+            const yScale = (y) => margin.top + plotHeight - (y / yMax) * plotHeight;
+
+            // Draw axes
+            svg.innerHTML += `<line x1="${margin.left}" y1="${margin.top + plotHeight}" x2="${width - margin.right}" y2="${margin.top + plotHeight}" stroke="${colors.grid}" stroke-width="2"/>`;
+            svg.innerHTML += `<line x1="${margin.left}" y1="${margin.top}" x2="${margin.left}" y2="${margin.top + plotHeight}" stroke="${colors.grid}" stroke-width="2"/>`;
+
+            // Draw bars
+            const barWidth = plotWidth / n * 0.6;
+            for (let i = 0; i <= n; i++) {
+                const prob = binomialPMF(i, n, p);
+                const x = xScale(i);
+                const y = yScale(prob);
+                const barHeight = plotHeight - (y - margin.top);
+                const color = i === k ? colors.purple : colors.primary;
+                svg.innerHTML += `<rect x="${x - barWidth/2}" y="${y}" width="${barWidth}" height="${barHeight}" fill="${color}" opacity="${i === k ? 0.8 : 0.6}" class="animated-curve"/>`;
+                if (i % Math.max(1, Math.floor(n / 10)) === 0 || i === n) {
+                    svg.innerHTML += `<text x="${x}" y="${margin.top + plotHeight + 25}" fill="${colors.text}" font-size="12" text-anchor="middle">${i}</text>`;
+                }
+            }
+
+            svg.innerHTML += `<text x="${width/2}" y="30" fill="${colors.text}" font-size="16" font-weight="bold" text-anchor="middle">Distribución Binomial (n=${n}, p=${p.toFixed(2)})</text>`;
+            svg.innerHTML += `<text x="${width/2}" y="${height - 10}" fill="${colors.text}" font-size="14" text-anchor="middle">k (número de éxitos)</text>`;
+            svg.innerHTML += `<text x="20" y="${height/2}" fill="${colors.text}" font-size="14" text-anchor="middle" transform="rotate(-90, 20, ${height/2})">P(X = k)</text>`;
+        }
+
+        // === POISSON DISTRIBUTION ===
+        function poissonPMF(k, lambda) {
+            return (Math.pow(lambda, k) * Math.exp(-lambda)) / factorial(k);
+        }
+
+        function drawPoissonDistribution() {
+            const lambda = parseFloat(document.getElementById('poissonLambda').value);
+            const k = parseInt(document.getElementById('poissonK').value);
+
+            document.getElementById('poissonLambdaValue').textContent = lambda.toFixed(1);
+            document.getElementById('poissonMean').textContent = lambda.toFixed(2);
+            document.getElementById('poissonVariance').textContent = lambda.toFixed(2);
+            document.getElementById('poissonStd').textContent = Math.sqrt(lambda).toFixed(2);
+            document.getElementById('poissonSkew').textContent = (1 / Math.sqrt(lambda)).toFixed(2);
+
+            const prob = poissonPMF(k, lambda);
+            document.getElementById('poissonProb').textContent = `P(X = ${k}) = ${prob.toFixed(4)}`;
+
+            // Draw SVG
+            const svg = document.getElementById('poissonSVG');
+            svg.innerHTML = '';
+            const colors = getColors();
+
+            const width = 900, height = 450;
+            const margin = { top: 40, right: 40, bottom: 60, left: 60 };
+            const plotWidth = width - margin.left - margin.right;
+            const plotHeight = height - margin.top - margin.bottom;
+
+            const maxK = Math.min(Math.ceil(lambda + 4 * Math.sqrt(lambda)), 50);
+            const xScale = (x) => margin.left + (x / maxK) * plotWidth;
+
+            let yMax = 0;
+            for (let i = 0; i <= maxK; i++) {
+                yMax = Math.max(yMax, poissonPMF(i, lambda));
+            }
+            yMax *= 1.2;
+            const yScale = (y) => margin.top + plotHeight - (y / yMax) * plotHeight;
+
+            // Draw axes
+            svg.innerHTML += `<line x1="${margin.left}" y1="${margin.top + plotHeight}" x2="${width - margin.right}" y2="${margin.top + plotHeight}" stroke="${colors.grid}" stroke-width="2"/>`;
+            svg.innerHTML += `<line x1="${margin.left}" y1="${margin.top}" x2="${margin.left}" y2="${margin.top + plotHeight}" stroke="${colors.grid}" stroke-width="2"/>`;
+
+            // Draw bars
+            const barWidth = plotWidth / maxK * 0.6;
+            for (let i = 0; i <= maxK; i++) {
+                const prob = poissonPMF(i, lambda);
+                const x = xScale(i);
+                const y = yScale(prob);
+                const barHeight = plotHeight - (y - margin.top);
+                const color = i === k ? colors.purple : colors.primary;
+                svg.innerHTML += `<rect x="${x - barWidth/2}" y="${y}" width="${barWidth}" height="${barHeight}" fill="${color}" opacity="${i === k ? 0.8 : 0.6}" class="animated-curve"/>`;
+                if (i % Math.max(1, Math.floor(maxK / 10)) === 0 || i === maxK) {
+                    svg.innerHTML += `<text x="${x}" y="${margin.top + plotHeight + 25}" fill="${colors.text}" font-size="12" text-anchor="middle">${i}</text>`;
+                }
+            }
+
+            svg.innerHTML += `<text x="${width/2}" y="30" fill="${colors.text}" font-size="16" font-weight="bold" text-anchor="middle">Distribución de Poisson (λ=${lambda.toFixed(1)})</text>`;
+            svg.innerHTML += `<text x="${width/2}" y="${height - 10}" fill="${colors.text}" font-size="14" text-anchor="middle">k (número de eventos)</text>`;
+            svg.innerHTML += `<text x="20" y="${height/2}" fill="${colors.text}" font-size="14" text-anchor="middle" transform="rotate(-90, 20, ${height/2})">P(X = k)</text>`;
+        }
+
+        // === t-STUDENT DISTRIBUTION ===
+        function drawTStudentDistribution() {
+            const df = parseInt(document.getElementById('tStudentDf').value);
+            const confidence = parseFloat(document.getElementById('tStudentConfidence').value);
+
+            document.getElementById('tStudentDfValue').textContent = df;
+
+            const variance = df > 2 ? df / (df - 2) : Infinity;
+            const std = Math.sqrt(variance);
+            const kurtosis = df > 4 ? 6 / (df - 4) : Infinity;
+
+            document.getElementById('tStudentVariance').textContent = variance !== Infinity ? variance.toFixed(2) : '∞';
+            document.getElementById('tStudentStd').textContent = std !== Infinity ? std.toFixed(2) : '∞';
+            document.getElementById('tStudentKurtosis').textContent = kurtosis !== Infinity ? kurtosis.toFixed(2) : '∞';
+
+            const alpha = (100 - confidence) / 100;
+            const tCritical = jstat.studentt.inv(1 - alpha/2, df);
+            document.getElementById('tStudentCritical').textContent = `t crítico (bilateral, ${confidence}%) = ±${tCritical.toFixed(3)}`;
+
+            // Draw SVG
+            const svg = document.getElementById('tStudentSVG');
+            svg.innerHTML = '';
+            const colors = getColors();
+
+            const width = 900, height = 450;
+            const margin = { top: 40, right: 40, bottom: 60, left: 60 };
+            const plotWidth = width - margin.left - margin.right;
+            const plotHeight = height - margin.top - margin.bottom;
+
+            const xMin = -5, xMax = 5;
+            const xScale = (x) => margin.left + ((x - xMin) / (xMax - xMin)) * plotWidth;
+
+            const yMax = jstat.studentt.pdf(0, df) * 1.2;
+            const yScale = (y) => margin.top + plotHeight - (y / yMax) * plotHeight;
+
+            // Draw axes
+            svg.innerHTML += `<line x1="${margin.left}" y1="${margin.top + plotHeight}" x2="${width - margin.right}" y2="${margin.top + plotHeight}" stroke="${colors.grid}" stroke-width="2"/>`;
+            svg.innerHTML += `<line x1="${margin.left}" y1="${margin.top}" x2="${margin.left}" y2="${margin.top + plotHeight}" stroke="${colors.grid}" stroke-width="2"/>`;
+
+            // Draw t-student curve
+            let pathD = '';
+            for (let i = 0; i <= 200; i++) {
+                const x = xMin + (xMax - xMin) * i / 200;
+                const y = jstat.studentt.pdf(x, df);
+                pathD += (i === 0 ? 'M' : 'L') + ` ${xScale(x)} ${yScale(y)}`;
+            }
+            svg.innerHTML += `<path d="${pathD}" fill="none" stroke="${colors.primary}" stroke-width="3" class="animated-curve"/>`;
+
+            // Draw normal comparison (dashed)
+            let normalPath = '';
+            for (let i = 0; i <= 200; i++) {
+                const x = xMin + (xMax - xMin) * i / 200;
+                const y = jstat.normal.pdf(x, 0, 1);
+                normalPath += (i === 0 ? 'M' : 'L') + ` ${xScale(x)} ${yScale(y)}`;
+            }
+            svg.innerHTML += `<path d="${normalPath}" fill="none" stroke="${colors.secondary}" stroke-width="2" stroke-dasharray="5,5" opacity="0.6"/>`;
+
+            // Shade critical regions
+            let leftTail = `M ${xScale(xMin)} ${yScale(0)}`;
+            for (let x = xMin; x <= -tCritical; x += 0.1) {
+                const y = jstat.studentt.pdf(x, df);
+                leftTail += ` L ${xScale(x)} ${yScale(y)}`;
+            }
+            leftTail += ` L ${xScale(-tCritical)} ${yScale(0)} Z`;
+            svg.innerHTML += `<path d="${leftTail}" fill="${colors.purple}" opacity="0.3"/>`;
+
+            let rightTail = `M ${xScale(tCritical)} ${yScale(0)}`;
+            for (let x = tCritical; x <= xMax; x += 0.1) {
+                const y = jstat.studentt.pdf(x, df);
+                rightTail += ` L ${xScale(x)} ${yScale(y)}`;
+            }
+            rightTail += ` L ${xScale(xMax)} ${yScale(0)} Z`;
+            svg.innerHTML += `<path d="${rightTail}" fill="${colors.purple}" opacity="0.3"/>`;
+
+            // Grid and labels
+            for (let i = -4; i <= 4; i++) {
+                const xPos = xScale(i);
+                if (i !== 0) svg.innerHTML += `<line x1="${xPos}" y1="${margin.top}" x2="${xPos}" y2="${margin.top + plotHeight}" stroke="${colors.grid}" stroke-width="1" opacity="0.3" stroke-dasharray="5,5"/>`;
+                svg.innerHTML += `<text x="${xPos}" y="${margin.top + plotHeight + 25}" fill="${colors.text}" font-size="12" text-anchor="middle">${i}</text>`;
+            }
+
+            svg.innerHTML += `<text x="${width/2}" y="30" fill="${colors.text}" font-size="16" font-weight="bold" text-anchor="middle">Distribución t-Student (ν=${df})</text>`;
+            svg.innerHTML += `<text x="${width - 150}" y="70" fill="${colors.secondary}" font-size="12">--- Normal(0,1)</text>`;
+            svg.innerHTML += `<text x="${width/2}" y="${height - 10}" fill="${colors.text}" font-size="14" text-anchor="middle">t</text>`;
+            svg.innerHTML += `<text x="20" y="${height/2}" fill="${colors.text}" font-size="14" text-anchor="middle" transform="rotate(-90, 20, ${height/2})">f(t)</text>`;
+        }
+
+        // === CHI-SQUARE DISTRIBUTION ===
+        function drawChiSquareDistribution() {
+            const df = parseInt(document.getElementById('chiSquareDf').value);
+            const alpha = parseFloat(document.getElementById('chiSquareAlpha').value) / 100;
+
+            document.getElementById('chiSquareDfValue').textContent = df;
+            document.getElementById('chiSquareMean').textContent = df;
+            document.getElementById('chiSquareVariance').textContent = (2 * df).toFixed(2);
+            document.getElementById('chiSquareStd').textContent = Math.sqrt(2 * df).toFixed(2);
+            document.getElementById('chiSquareSkew').textContent = Math.sqrt(8 / df).toFixed(2);
+
+            const chiCritical = jstat.chisquare.inv(1 - alpha, df);
+            document.getElementById('chiSquareCritical').textContent = `χ² crítico (α=${(alpha*100).toFixed(1)}%) = ${chiCritical.toFixed(3)}`;
+
+            // Draw SVG
+            const svg = document.getElementById('chiSquareSVG');
+            svg.innerHTML = '';
+            const colors = getColors();
+
+            const width = 900, height = 450;
+            const margin = { top: 40, right: 40, bottom: 60, left: 60 };
+            const plotWidth = width - margin.left - margin.right;
+            const plotHeight = height - margin.top - margin.bottom;
+
+            const xMin = 0;
+            const xMax = Math.max(df + 4 * Math.sqrt(2 * df), chiCritical + 5);
+            const xScale = (x) => margin.left + (x / xMax) * plotWidth;
+
+            const yMax = jstat.chisquare.pdf(Math.max(df - 2, 0.5), df) * 1.2;
+            const yScale = (y) => margin.top + plotHeight - (y / yMax) * plotHeight;
+
+            // Draw axes
+            svg.innerHTML += `<line x1="${margin.left}" y1="${margin.top + plotHeight}" x2="${width - margin.right}" y2="${margin.top + plotHeight}" stroke="${colors.grid}" stroke-width="2"/>`;
+            svg.innerHTML += `<line x1="${margin.left}" y1="${margin.top}" x2="${margin.left}" y2="${margin.top + plotHeight}" stroke="${colors.grid}" stroke-width="2"/>`;
+
+            // Draw chi-square curve
+            let pathD = '';
+            for (let i = 0; i <= 200; i++) {
+                const x = xMax * i / 200;
+                const y = jstat.chisquare.pdf(x, df);
+                pathD += (i === 0 ? 'M' : 'L') + ` ${xScale(x)} ${yScale(y)}`;
+            }
+            svg.innerHTML += `<path d="${pathD}" fill="none" stroke="${colors.primary}" stroke-width="3" class="animated-curve"/>`;
+
+            // Shade critical region
+            let criticalPath = `M ${xScale(chiCritical)} ${yScale(0)}`;
+            for (let x = chiCritical; x <= xMax; x += xMax / 100) {
+                const y = jstat.chisquare.pdf(x, df);
+                criticalPath += ` L ${xScale(x)} ${yScale(y)}`;
+            }
+            criticalPath += ` L ${xScale(xMax)} ${yScale(0)} Z`;
+            svg.innerHTML += `<path d="${criticalPath}" fill="${colors.purple}" opacity="0.3"/>`;
+
+            // Grid
+            for (let i = 0; i <= 5; i++) {
+                const x = xMax * i / 5;
+                const xPos = xScale(x);
+                svg.innerHTML += `<line x1="${xPos}" y1="${margin.top}" x2="${xPos}" y2="${margin.top + plotHeight}" stroke="${colors.grid}" stroke-width="1" opacity="0.3" stroke-dasharray="5,5"/>`;
+                svg.innerHTML += `<text x="${xPos}" y="${margin.top + plotHeight + 25}" fill="${colors.text}" font-size="12" text-anchor="middle">${x.toFixed(1)}</text>`;
+            }
+
+            svg.innerHTML += `<text x="${width/2}" y="30" fill="${colors.text}" font-size="16" font-weight="bold" text-anchor="middle">Distribución Chi-cuadrado (k=${df})</text>`;
+            svg.innerHTML += `<text x="${width/2}" y="${height - 10}" fill="${colors.text}" font-size="14" text-anchor="middle">χ²</text>`;
+            svg.innerHTML += `<text x="20" y="${height/2}" fill="${colors.text}" font-size="14" text-anchor="middle" transform="rotate(-90, 20, ${height/2})">f(χ²)</text>`;
+        }
+
+        // Update all charts (for theme change)
+        function updateAllCharts() {
+            drawNormalDistribution();
+            drawBinomialDistribution();
+            drawPoissonDistribution();
+            drawTStudentDistribution();
+            drawChiSquareDistribution();
+        }
+
+        // Event listeners
+        document.getElementById('normalMu').addEventListener('input', drawNormalDistribution);
+        document.getElementById('normalSigma').addEventListener('input', drawNormalDistribution);
+        document.getElementById('normalA').addEventListener('input', drawNormalDistribution);
+        document.getElementById('normalB').addEventListener('input', drawNormalDistribution);
+
+        document.getElementById('binomialN').addEventListener('input', drawBinomialDistribution);
+        document.getElementById('binomialP').addEventListener('input', drawBinomialDistribution);
+        document.getElementById('binomialK').addEventListener('input', drawBinomialDistribution);
+
+        document.getElementById('poissonLambda').addEventListener('input', drawPoissonDistribution);
+        document.getElementById('poissonK').addEventListener('input', drawPoissonDistribution);
+
+        document.getElementById('tStudentDf').addEventListener('input', drawTStudentDistribution);
+        document.getElementById('tStudentConfidence').addEventListener('input', drawTStudentDistribution);
+
+        document.getElementById('chiSquareDf').addEventListener('input', drawChiSquareDistribution);
+        document.getElementById('chiSquareAlpha').addEventListener('input', drawChiSquareDistribution);
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            initTheme();
+            initTabs();
+            drawNormalDistribution();
+            drawBinomialDistribution();
+            drawPoissonDistribution();
+            drawTStudentDistribution();
+            drawChiSquareDistribution();
+            console.log('📊 Visualizador de Distribuciones Estadísticas - Cargado');
+        });
+    </script>
+</body>
+</html>
