@@ -607,13 +607,18 @@
             const cover = parseFloat(document.getElementById('cover').value);
             const Mu = parseFloat(document.getElementById('mu').value);
 
-            const d = h - cover - 1.27;
+            const d = h - cover - 1.27; // Peralte efectivo
             const beta1 = fc <= 280 ? 0.85 : 0.85 - 0.05 * (fc - 280) / 70;
-            const rho_min = 0.7 * Math.sqrt(fc) / fy;
-            const Rn = Mu / (0.9 * b * d * d);
-            const rho = (0.85 * fc / fy) * (1 - Math.sqrt(1 - (2 * Rn) / (0.85 * fc)));
+            const rho_min = 0.7 * Math.sqrt(fc) / fy; // Cuantía mínima
+
+            // Cálculo de Rn y rho
+            const Rn = Mu / (0.9 * b * d * d); // kg/cm²
+            const sqrt_term = Math.max(0, 1 - (2 * Rn) / (0.85 * fc)); // Proteger contra raíz negativa
+            const rho = (0.85 * fc / fy) * (1 - Math.sqrt(sqrt_term));
             const rho_final = Math.max(rho, rho_min);
             const As = rho_final * b * d;
+
+            // Cálculo de capacidad
             const a = (As * fy) / (0.85 * fc * b);
             const Mn = As * fy * (d - a / 2);
             const phi_Mn = 0.9 * Mn;
@@ -624,8 +629,8 @@
             document.getElementById('phi_mn').innerHTML = `${phi_Mn.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}<span class="result-unit">kg-cm</span>`;
 
             const verification = phi_Mn >= Mu ?
-                `<div class="success-box"><div class="success-title"><i class="fas fa-check-circle"></i> Viga OK</div><p style="color:var(--text-secondary)">φMn ≥ Mu ✓</p></div>` :
-                `<div class="warning-box"><div class="warning-title"><i class="fas fa-exclamation-triangle"></i> Advertencia</div><p style="color:var(--text-secondary)">Aumentar dimensiones o f'c</p></div>`;
+                `<div class="success-box"><div class="success-title"><i class="fas fa-check-circle"></i> Viga OK</div><p style="color:var(--text-secondary)">φMn (${phi_Mn.toFixed(0)}) ≥ Mu (${Mu}) ✓</p></div>` :
+                `<div class="warning-box"><div class="warning-title"><i class="fas fa-exclamation-triangle"></i> Advertencia</div><p style="color:var(--text-secondary)">Aumentar dimensiones o f'c<br>φMn (${phi_Mn.toFixed(0)}) < Mu (${Mu})</p></div>`;
             document.getElementById('beamVerification').innerHTML = verification;
 
             drawBeamSVG(b, h, d, As);
@@ -711,20 +716,24 @@
         }
 
         function calculateSlab() {
-            const L = parseFloat(document.getElementById('span').value) * 100;
+            const L = parseFloat(document.getElementById('span').value) * 100; // cm
             const type = document.getElementById('slabType').value;
             const h = parseFloat(document.getElementById('slabH').value);
-            const wu = parseFloat(document.getElementById('wu').value) / 10000;
+            const wu = parseFloat(document.getElementById('wu').value) / 10000; // kg/cm²
 
             const hmin = type === 'aligerada' ? L / 25 : L / 28;
-            const Mu = (wu * Math.pow(L, 2)) / 8;
+            const Mu = (wu * Math.pow(L, 2)) / 8; // kg-cm/cm de ancho
             const fc = 210, fy = 4200, b = 100, d = h - 4;
-            const Rn = (Mu * 100000) / (0.9 * b * d * d);
-            const rho = (0.85 * fc / fy) * (1 - Math.sqrt(1 - (2 * Rn) / (0.85 * fc)));
-            const As = rho * b * d;
+
+            // Mu ya está en kg-cm, d y b en cm
+            const Rn = Mu / (0.9 * b * d * d); // kg/cm²
+            const rho = (0.85 * fc / fy) * (1 - Math.sqrt(Math.max(0, 1 - (2 * Rn) / (0.85 * fc))));
+            const rho_min = 0.0018; // Cuantía mínima
+            const rho_final = Math.max(rho, rho_min);
+            const As = rho_final * b * d;
 
             document.getElementById('hmin').innerHTML = `${hmin.toFixed(2)}<span class="result-unit">cm</span>`;
-            document.getElementById('slabMu').innerHTML = `${(Mu / 100).toFixed(2)}<span class="result-unit">kg-m</span>`;
+            document.getElementById('slabMu').innerHTML = `${(Mu / 100).toFixed(2)}<span class="result-unit">kg-m/m</span>`;
             document.getElementById('slabAs').innerHTML = `${As.toFixed(2)}<span class="result-unit">cm²/m</span>`;
             document.getElementById('deflection').innerHTML = `${(L/360).toFixed(2)}<span class="result-unit">cm</span>`;
 
@@ -777,12 +786,15 @@
             const fc = parseFloat(document.getElementById('footingFc').value);
             const fy = parseFloat(document.getElementById('footingFy').value);
 
-            // Área requerida
+            // Área requerida (basada en carga de servicio)
             const A_req = P / (sigma_t * 10000); // m²
             const B = Math.ceil(Math.sqrt(A_req) * 100); // cm, redondeado
             const A_real = (B * B) / 10000; // m²
 
-            // Presión última del suelo
+            // Presión de servicio del suelo
+            const q_servicio = P / (B * B); // kg/cm²
+
+            // Presión última del suelo (para diseño)
             const Pu = 1.4 * P; // Carga última
             const qu = Pu / (B * B); // kg/cm²
 
@@ -799,7 +811,7 @@
 
             // Acero requerido
             const Rn = Mu / (0.9 * 100 * d * d); // Por metro de ancho
-            const rho = (0.85 * fc / fy) * (1 - Math.sqrt(1 - (2 * Rn) / (0.85 * fc)));
+            const rho = (0.85 * fc / fy) * (1 - Math.sqrt(Math.max(0, 1 - (2 * Rn) / (0.85 * fc))));
             const rho_min = 0.0018; // Acero mínimo para zapatas
             const rho_final = Math.max(rho, rho_min);
             const As = rho_final * 100 * d; // cm²/m
@@ -807,12 +819,13 @@
             document.getElementById('footingArea').innerHTML = `${A_real.toFixed(2)}<span class="result-unit">m²</span>`;
             document.getElementById('footingB').innerHTML = `${B}<span class="result-unit">cm</span>`;
             document.getElementById('footingH').innerHTML = `${h}<span class="result-unit">cm</span>`;
-            document.getElementById('soilPressure').innerHTML = `${qu.toFixed(4)}<span class="result-unit">kg/cm²</span>`;
-            document.getElementById('footingAsx').innerHTML = `${As.toFixed(2)}<span class="result-unit">cm²</span>`;
-            document.getElementById('footingAsy').innerHTML = `${As.toFixed(2)}<span class="result-unit">cm²</span>`;
+            document.getElementById('soilPressure').innerHTML = `${q_servicio.toFixed(4)}<span class="result-unit">kg/cm²</span>`;
+            document.getElementById('footingAsx').innerHTML = `${As.toFixed(2)}<span class="result-unit">cm²/m</span>`;
+            document.getElementById('footingAsy').innerHTML = `${As.toFixed(2)}<span class="result-unit">cm²/m</span>`;
 
-            const verification = qu <= sigma_t ?
-                `<div class="success-box"><div class="success-title"><i class="fas fa-check-circle"></i> Presión OK</div><p style="color:var(--text-secondary)">qu (${qu.toFixed(4)}) ≤ σt (${sigma_t}) ✓</p></div>` :
+            // Comparar presión de servicio con capacidad portante
+            const verification = q_servicio <= sigma_t ?
+                `<div class="success-box"><div class="success-title"><i class="fas fa-check-circle"></i> Presión OK</div><p style="color:var(--text-secondary)">q (${q_servicio.toFixed(4)}) ≤ σt (${sigma_t}) ✓</p></div>` :
                 `<div class="error-box"><div class="error-title"><i class="fas fa-times-circle"></i> Presión Excesiva</div><p style="color:var(--text-secondary)">Aumentar dimensiones de zapata</p></div>`;
             document.getElementById('footingVerification').innerHTML = verification;
 
