@@ -499,17 +499,40 @@
             };
         }
 
-        // Utility: Factorial
+        // Utility: Factorial con memoización para evitar stack overflow
+        const factorialCache = {};
         function factorial(n) {
             if (n <= 1) return 1;
-            return n * factorial(n - 1);
+            if (factorialCache[n]) return factorialCache[n];
+
+            // Iterativo para evitar stack overflow
+            let result = 1;
+            for (let i = 2; i <= n; i++) {
+                result *= i;
+            }
+            factorialCache[n] = result;
+            return result;
         }
 
-        // Utility: Binomial coefficient
+        // Utility: Logaritmo de factorial (más estable)
+        function logFactorial(n) {
+            if (n <= 1) return 0;
+            let result = 0;
+            for (let i = 2; i <= n; i++) {
+                result += Math.log(i);
+            }
+            return result;
+        }
+
+        // Utility: Binomial coefficient (versión estable)
         function binomialCoeff(n, k) {
             if (k > n) return 0;
             if (k === 0 || k === n) return 1;
-            return factorial(n) / (factorial(k) * factorial(n - k));
+            if (k > n - k) k = n - k; // Optimización
+
+            // Usar logaritmos para evitar overflow
+            const logResult = logFactorial(n) - logFactorial(k) - logFactorial(n - k);
+            return Math.exp(logResult);
         }
 
         // === NORMAL DISTRIBUTION ===
@@ -908,17 +931,51 @@
         document.getElementById('chiSquareDf').addEventListener('input', drawChiSquareDistribution);
         document.getElementById('chiSquareAlpha').addEventListener('input', drawChiSquareDistribution);
 
-        // Initialize
-        document.addEventListener('DOMContentLoaded', () => {
-            initTheme();
-            initTabs();
-            drawNormalDistribution();
-            drawBinomialDistribution();
-            drawPoissonDistribution();
-            drawTStudentDistribution();
-            drawChiSquareDistribution();
-            console.log('📊 Visualizador de Distribuciones Estadísticas - Cargado');
-        });
+        // Initialize después de que jStat se cargue
+        function initializeApp() {
+            try {
+                // Verificar que jStat esté disponible
+                if (typeof jStat === 'undefined') {
+                    console.error('jStat no se cargó correctamente');
+                    alert('Error: La biblioteca de estadística no se cargó. Por favor recarga la página.');
+                    return;
+                }
+
+                console.log('✓ jStat cargado correctamente:', jStat.version || 'versión desconocida');
+
+                initTheme();
+                initTabs();
+
+                // Dibujar todas las distribuciones
+                console.log('Dibujando distribución Normal...');
+                drawNormalDistribution();
+
+                console.log('Dibujando distribución Binomial...');
+                drawBinomialDistribution();
+
+                console.log('Dibujando distribución Poisson...');
+                drawPoissonDistribution();
+
+                console.log('Dibujando distribución t-Student...');
+                drawTStudentDistribution();
+
+                console.log('Dibujando distribución Chi-cuadrado...');
+                drawChiSquareDistribution();
+
+                console.log('📊 Visualizador de Distribuciones Estadísticas - Cargado ✓');
+            } catch (error) {
+                console.error('Error al inicializar:', error);
+                alert('Error al cargar las visualizaciones: ' + error.message);
+            }
+        }
+
+        // Esperar a que el DOM y jStat estén listos
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initializeApp);
+        } else {
+            // DOM ya está listo, esperar un momento para jStat
+            setTimeout(initializeApp, 100);
+        }
     </script>
 </body>
 </html>
